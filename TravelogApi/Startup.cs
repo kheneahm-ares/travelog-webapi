@@ -35,7 +35,7 @@ namespace TravelogApi
                         config.Audience = "TravelogApi";
                     });
 
-            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ITravelPlanRepository, TravelPlanRepository>();
 
             services.AddControllers();
         }
