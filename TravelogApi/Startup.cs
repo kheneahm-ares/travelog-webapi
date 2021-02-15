@@ -1,3 +1,5 @@
+using DataAccess.Repositories;
+using DataAccess.Repositories.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +34,8 @@ namespace TravelogApi
                         //who we are
                         config.Audience = "TravelogApi";
                     });
+
+            services.AddScoped<IUserRepository, UserRepository>();
 
             services.AddControllers();
         }
