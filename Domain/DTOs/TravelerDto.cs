@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace Domain.DTOs
 {
-    public class UserDto
+    public class TravelerDto : UserDto
     {
-        public string Id { get; set; }
-        public string UserName { get; set; }
-        public string DisplayName { get; set; }
 
     }
 }

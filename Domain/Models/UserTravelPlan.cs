@@ -15,7 +15,6 @@ namespace Domain.Models
     {
         public Guid TravelPlanId { get; set; }
         public TravelPlan TravelPlan { get; set; }
-        public Guid ApiUserId { get; set; }
-        public ApiUser ApiUser { get; set; }
+        public Guid UserId { get; set; }
     }
 }
