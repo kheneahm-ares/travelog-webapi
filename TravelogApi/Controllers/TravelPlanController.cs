@@ -1,6 +1,5 @@
 ﻿using DataAccess.Repositories.Interfaces;
 using Domain.DTOs;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -29,7 +28,7 @@ namespace TravelogApi.Controllers
             try
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-                var isSuccessful = await _travelPlanRepository.CreateAsync(travelPlanDto, userId);
+                var isSuccessful = await _travelPlanRepository.CreateAsync(travelPlanDto, new Guid(userId));
 
                 if (!isSuccessful) return StatusCode(500);
 
@@ -40,12 +39,35 @@ namespace TravelogApi.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromQuery] string id)
+        {
+            try
+            {
+                var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
+                var isSuccessful = await _travelPlanRepository.DeleteAsync(new Guid(id), new Guid(userId));
+
+                if (!isSuccessful) return StatusCode(500);
+
+                return Ok();
+            }
+            catch (Exception exc)
+            {
+                return BadRequest();
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddTraveler([FromQuery] string travelPlanId, [FromQuery] string userId)
         {
             try
             {
-                var isSuccessful = await _travelPlanRepository.AddTravelerAsync(new Guid(travelPlanId), new Guid(userId));
+                var loggedInUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
+
+                var isSuccessful = await _travelPlanRepository.AddTravelerAsync(new Guid(travelPlanId),
+                                                                                new Guid(loggedInUserId),
+                                                                                new Guid(userId));
 
                 if (!isSuccessful) return StatusCode(500);
 
@@ -70,7 +92,6 @@ namespace TravelogApi.Controllers
             travelPlanDTO.Travelers = userTravelers.ToList();
 
             return Ok(travelPlanDTO);
-
         }
     }
 }

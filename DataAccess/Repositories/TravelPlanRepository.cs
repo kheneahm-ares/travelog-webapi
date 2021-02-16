@@ -18,13 +18,15 @@ namespace DataAccess.Repositories
             _userRepository = userRepository;
         }
 
-        public async Task<bool> AddTravelerAsync(Guid travelPlanId, Guid userId)
+        public async Task<bool> AddTravelerAsync(Guid travelPlanId, Guid loggedInUserId, Guid userId)
         {
             try
             {
                 //check if travelplan exists
                 var travelPlan = await _dbContext.TravelPlans.FindAsync(travelPlanId);
                 if (travelPlan == null) throw new Exception("Travel Plan Not Found");
+
+                if (travelPlan.CreatedById != loggedInUserId) throw new Exception("Insufficient rights to add traveler");
 
                 var userExists = await _userRepository.DoesUserExistsAsync(userId);
                 if (!userExists) throw new Exception("Invalid User Id");
@@ -47,18 +49,17 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<bool> CreateAsync(TravelPlanDto travelPlanDto, string userId)
+        public async Task<bool> CreateAsync(TravelPlanDto travelPlanDto, Guid userId)
         {
             try
             {
-                var userGuid = new Guid(userId);
                 var newTravelPlan = new TravelPlan
                 {
                     Name = travelPlanDto.Name,
                     Description = travelPlanDto.Description,
                     StartDate = travelPlanDto.StartDate,
                     EndDate = travelPlanDto.EndDate,
-                    CreatedById = userGuid
+                    CreatedById = userId
                 };
 
                 await _dbContext.TravelPlans.AddAsync(newTravelPlan);
@@ -66,7 +67,7 @@ namespace DataAccess.Repositories
                 var traveler = new UserTravelPlan
                 {
                     TravelPlan = newTravelPlan,
-                    UserId = userGuid
+                    UserId = userId
                 };
 
                 await _dbContext.UserTravelPlans.AddAsync(traveler);
@@ -81,9 +82,27 @@ namespace DataAccess.Repositories
             }
         }
 
-        public Task<bool> Delete(Guid travelPlanId, Guid userId)
+        public async Task<bool> DeleteAsync(Guid travelPlanId, Guid userId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var travelPlanToDelete = await _dbContext.TravelPlans.FindAsync(travelPlanId);
+
+                if (travelPlanToDelete == null) return true;
+
+                if (travelPlanToDelete.CreatedById != userId) throw new Exception("Don't have permission to delete");
+
+                //let EF core cascade delete and delete relations with dependent tables via collection nav properties
+                _dbContext.Remove(travelPlanToDelete);
+
+                var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
+
+                return isSuccessful;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public async Task<TravelPlan> GetAsync(Guid travelPlanId)
