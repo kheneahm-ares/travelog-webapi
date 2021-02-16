@@ -31,7 +31,24 @@ namespace DataAccess.Repositories
                 var userDtos = await connection.QueryAsync<UserDto>(GET_USERS_SQL, new { userIds = userIds });
                 return userDtos;
             }
-    
+        }
+
+        public async Task<bool> DoesUserExistsAsync(Guid userId)
+        {
+            const string USER_EXISTS_SQL = @"SELECT 1 FROM ASPNETUSERS WHERE ID=@userId";
+
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                try
+                {
+                    await connection.QueryFirstAsync<int>(USER_EXISTS_SQL, new { userId = userId });
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
         }
     }
 }

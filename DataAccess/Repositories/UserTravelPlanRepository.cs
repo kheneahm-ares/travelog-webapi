@@ -18,7 +18,7 @@ namespace DataAccess.Repositories
         {
             this.ConnectionString = configuration.GetConnectionString("TravelogApi");
         }
-        public async Task<IEnumerable<Guid>> GetTravelersForActivity(Guid travelPlanId)
+        public async Task<IEnumerable<Guid>> GetTravelersForActivityAsync(Guid travelPlanId)
         {
             const string GET_TRAVELERS_SQL = @"SELECT USERID FROM USERTRAVELPLANS WHERE TRAVELPLANID = @Id";
             using (SqlConnection connection = new SqlConnection(ConnectionString))

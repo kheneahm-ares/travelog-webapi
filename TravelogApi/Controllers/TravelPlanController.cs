@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace TravelogApi.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class TravelPlanController : Controller
     {
         private readonly ITravelPlanRepository _travelPlanRepository;
@@ -29,7 +29,26 @@ namespace TravelogApi.Controllers
             try
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-                await _travelPlanRepository.CreateAsync(travelPlanDto, userId);
+                var isSuccessful = await _travelPlanRepository.CreateAsync(travelPlanDto, userId);
+
+                if (!isSuccessful) return StatusCode(500);
+
+                return Ok();
+            }
+            catch (Exception exc)
+            {
+                return BadRequest();
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddTraveler([FromQuery] string travelPlanId, [FromQuery] string userId)
+        {
+            try
+            {
+                var isSuccessful = await _travelPlanRepository.AddTravelerAsync(new Guid(travelPlanId), new Guid(userId));
+
+                if (!isSuccessful) return StatusCode(500);
+
                 return Ok();
             }
             catch (Exception exc)
@@ -42,9 +61,9 @@ namespace TravelogApi.Controllers
         public async Task<IActionResult> Details([FromQuery] string id)
         {
             var travelPlanId = new Guid(id);
-            var travelers = await _userTravelPlanRepository.GetTravelersForActivity(travelPlanId);
-            var userTravelers = await _userRepository.GetUsersAsync(travelers);
 
+            var travelers = await _userTravelPlanRepository.GetTravelersForActivityAsync(travelPlanId);
+            var userTravelers = await _userRepository.GetUsersAsync(travelers);
             var travelPlan = await _travelPlanRepository.GetAsync(travelPlanId);
 
             var travelPlanDTO = new TravelPlanDto(travelPlan);

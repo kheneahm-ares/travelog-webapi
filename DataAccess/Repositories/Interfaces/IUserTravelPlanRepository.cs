@@ -8,6 +8,6 @@ namespace DataAccess.Repositories.Interfaces
 {
     public interface IUserTravelPlanRepository
     {
-        Task<IEnumerable<Guid>> GetTravelersForActivity(Guid travelPlanId);
+        Task<IEnumerable<Guid>> GetTravelersForActivityAsync(Guid travelPlanId);
     }
 }
