@@ -14,6 +14,7 @@ namespace Domain.DTOs
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string Description { get; set; }
+        public Guid CreatedById { get; set; }
         public List<UserDto> Travelers { get; set; }
 
         public TravelPlanDto()
@@ -27,6 +28,7 @@ namespace Domain.DTOs
             this.StartDate = travelPlan.StartDate;
             this.EndDate = travelPlan.EndDate;
             this.Description = travelPlan.Description;
+            this.CreatedById = travelPlan.CreatedById;
         }
 
     }

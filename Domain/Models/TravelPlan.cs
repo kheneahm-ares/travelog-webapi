@@ -17,6 +17,8 @@ namespace Domain.Models
         public DateTime EndDate { get; set; }
         public string Description { get; set; }
 
+        public Guid CreatedById { get; set; }
+
         //collection navigation properties
         public List<TravelPlanActivity> TravelPlanActivities { get; set; } 
         public virtual List<UserTravelPlan> UserTravelPlans { get; set; }

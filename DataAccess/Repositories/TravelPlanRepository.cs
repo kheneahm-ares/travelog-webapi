@@ -3,9 +3,6 @@ using Domain.DTOs;
 using Domain.Models;
 using Persistence;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccess.Repositories
@@ -18,16 +15,19 @@ namespace DataAccess.Repositories
         {
             _dbContext = dbContext;
         }
+
         public async Task CreateAsync(TravelPlanDto travelPlanDto, string userId)
         {
             try
             {
+                var userGuid = new Guid(userId);
                 var newTravelPlan = new TravelPlan
                 {
                     Name = travelPlanDto.Name,
                     Description = travelPlanDto.Description,
                     StartDate = travelPlanDto.StartDate,
-                    EndDate = travelPlanDto.EndDate
+                    EndDate = travelPlanDto.EndDate,
+                    CreatedById = userGuid
                 };
 
                 await _dbContext.TravelPlans.AddAsync(newTravelPlan);
@@ -35,16 +35,15 @@ namespace DataAccess.Repositories
                 var traveler = new UserTravelPlan
                 {
                     TravelPlan = newTravelPlan,
-                    UserId = new Guid(userId)
+                    UserId = userGuid
                 };
 
                 await _dbContext.UserTravelPlans.AddAsync(traveler);
 
                 var isSuccesful = await _dbContext.SaveChangesAsync() > 0;
             }
-            catch(Exception exc)
+            catch (Exception exc)
             {
-
             }
         }
 
@@ -55,15 +54,13 @@ namespace DataAccess.Repositories
                 var travelPlan = await _dbContext.TravelPlans.FindAsync(travelPlanId);
 
                 if (travelPlan == null) throw new Exception("Travel Plan not found");
-            
-                return travelPlan;
 
+                return travelPlan;
             }
             catch
             {
                 throw;
-
+            }
         }
     }
-}
 }
