@@ -55,7 +55,7 @@ namespace DataAccess.Repositories
                 var travelPlan = await _dbContext.TravelPlans.FindAsync(travelPlanId);
 
                 if (travelPlan == null) throw new Exception("Travel Plan not found");
-
+            
                 return travelPlan;
 
             }
@@ -63,7 +63,7 @@ namespace DataAccess.Repositories
             {
                 throw;
 
-            }
         }
     }
+}
 }

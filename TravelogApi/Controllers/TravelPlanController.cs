@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace TravelogApi.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class TravelPlanController : Controller
     {
         private readonly ITravelPlanRepository _travelPlanRepository;
