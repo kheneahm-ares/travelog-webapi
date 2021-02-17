@@ -28,6 +28,7 @@ namespace DataAccess.Repositories
 
                 if (travelPlan.CreatedById != loggedInUserId) throw new Exception("Insufficient rights to add traveler");
 
+                //check if user exists
                 var userExists = await _userRepository.DoesUserExistsAsync(userId);
                 if (!userExists) throw new Exception("Invalid User Id");
 
@@ -53,6 +54,7 @@ namespace DataAccess.Repositories
         {
             try
             {
+                //map here
                 var newTravelPlan = new TravelPlan
                 {
                     Name = travelPlanDto.Name,
@@ -114,6 +116,7 @@ namespace DataAccess.Repositories
 
                 if (travelPlanToEdit.CreatedById != userId) throw new Exception("Insufficient rights to edit Travel Plan");
 
+                //map here
                 travelPlanToEdit.TravelPlanId = travelPlanDto.Id;
                 travelPlanToEdit.Name = travelPlanDto.Name;
                 travelPlanToEdit.StartDate = travelPlanDto.StartDate;
@@ -132,7 +135,7 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<TravelPlan> GetAsync(Guid travelPlanId)
+        public async Task<TravelPlanDto> GetAsync(Guid travelPlanId)
         {
             try
             {
@@ -140,7 +143,7 @@ namespace DataAccess.Repositories
 
                 if (travelPlan == null) throw new Exception("Travel Plan not found");
 
-                return travelPlan;
+                return new TravelPlanDto(travelPlan);
             }
             catch
             {

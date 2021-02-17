@@ -39,6 +39,7 @@ namespace TravelogApi.Controllers
                 return BadRequest();
             }
         }
+
         [HttpPut]
         public async Task<IActionResult> Edit([FromBody] TravelPlanDto travelPlanDto)
         {
@@ -56,7 +57,6 @@ namespace TravelogApi.Controllers
                 return BadRequest();
             }
         }
-
 
         [HttpDelete]
         public async Task<IActionResult> Delete([FromQuery] string id)
@@ -104,9 +104,8 @@ namespace TravelogApi.Controllers
 
             var travelers = await _userTravelPlanRepository.GetTravelersForActivityAsync(travelPlanId);
             var userTravelers = await _userRepository.GetUsersAsync(travelers);
-            var travelPlan = await _travelPlanRepository.GetAsync(travelPlanId);
+            var travelPlanDTO = await _travelPlanRepository.GetAsync(travelPlanId);
 
-            var travelPlanDTO = new TravelPlanDto(travelPlan);
             travelPlanDTO.Travelers = userTravelers.ToList();
 
             return Ok(travelPlanDTO);

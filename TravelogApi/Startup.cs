@@ -31,13 +31,14 @@ namespace TravelogApi
                     {
                         config.Authority = "https://localhost:5001/";
 
-                        //who we are
+                        //who we are, needed by server to check whether token is for this resource
                         config.Audience = "TravelogApi";
                     });
 
             services.AddScoped<ITravelPlanRepository, TravelPlanRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserTravelPlanRepository, UserTravelPlanRepository>();
+            services.AddScoped<ITravelPlanActivityRepository, TravelPlanActivityRepository>();
 
             services.AddControllers();
         }

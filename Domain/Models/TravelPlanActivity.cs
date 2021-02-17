@@ -15,6 +15,7 @@ namespace Domain.Models
         public DateTime EndTime { get; set; }
         public string Category { get; set; }
         public string Location { get; set; }
+        public Guid HostId { get; set; }
 
 
         public Guid TravelPlanId { get; set; }
