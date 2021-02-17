@@ -66,6 +66,7 @@ namespace DataAccess.Repositories
 
                 await _dbContext.TravelPlans.AddAsync(newTravelPlan);
 
+                //add to jxn table
                 var traveler = new UserTravelPlan
                 {
                     TravelPlan = newTravelPlan,

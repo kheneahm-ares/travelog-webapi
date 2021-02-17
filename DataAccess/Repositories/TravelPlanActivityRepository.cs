@@ -25,6 +25,7 @@ namespace DataAccess.Repositories
 
                 if (travelPlan == null) throw new Exception("Travel Plan Not Found");
 
+                //map here
                 var newActivity = new TravelPlanActivity
                 {
                     Name = activityDto.Name,

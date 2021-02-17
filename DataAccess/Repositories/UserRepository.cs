@@ -39,6 +39,7 @@ namespace DataAccess.Repositories
 
             using (SqlConnection connection = new SqlConnection(ConnectionString))
             {
+                //queryfirst throws exception if not exists
                 try
                 {
                     await connection.QueryFirstAsync<int>(USER_EXISTS_SQL, new { userId = userId });
