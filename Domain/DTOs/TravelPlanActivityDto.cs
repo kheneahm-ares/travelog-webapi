@@ -18,6 +18,11 @@ namespace Domain.DTOs
         public string Category { get; set; }
         public string Location { get; set; }
 
+        public TravelPlanActivityDto()
+        {
+
+        }
+
         public TravelPlanActivityDto(TravelPlanActivity travelPlanActivity)
         {
             this.TravelPlanId = travelPlanActivity.TravelPlanId;

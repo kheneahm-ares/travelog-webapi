@@ -46,10 +46,9 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Models.TravelPlanActivity", b =>
                 {
-                    b.Property<int>("TravelPlanActivityId")
+                    b.Property<Guid>("TravelPlanActivityId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");

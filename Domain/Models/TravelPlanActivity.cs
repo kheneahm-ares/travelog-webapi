@@ -9,7 +9,7 @@ namespace Domain.Models
 
     public class TravelPlanActivity
     {
-        public int TravelPlanActivityId { get; set; }
+        public Guid TravelPlanActivityId { get; set; }
         public string Name { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }

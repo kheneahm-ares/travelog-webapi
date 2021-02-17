@@ -39,8 +39,7 @@ namespace Persistence.Migrations
                 name: "TravelPlanActivities",
                 columns: table => new
                 {
-                    TravelPlanActivityId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TravelPlanActivityId = table.Column<Guid>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     StartTime = table.Column<DateTime>(nullable: false),
                     EndTime = table.Column<DateTime>(nullable: false),
