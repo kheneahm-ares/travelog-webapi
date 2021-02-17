@@ -25,6 +25,7 @@ namespace Domain.DTOs
 
         public TravelPlanActivityDto(TravelPlanActivity travelPlanActivity)
         {
+            this.Id = travelPlanActivity.TravelPlanActivityId;
             this.TravelPlanId = travelPlanActivity.TravelPlanId;
             this.HostId = travelPlanActivity.HostId;
             this.Name = travelPlanActivity.Name;

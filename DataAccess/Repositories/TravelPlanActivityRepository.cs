@@ -78,7 +78,7 @@ namespace DataAccess.Repositories
         {
             try
             {
-                var activityToEdit = await _dbContext.TravelPlanActivities.FindAsync(activityDto.TravelPlanId);
+                var activityToEdit = await _dbContext.TravelPlanActivities.FindAsync(activityDto.Id);
 
                 if (activityToEdit == null) throw new Exception("Activity not found");
                 if (activityToEdit.HostId != userId) throw new Exception("Insufficient rights to edit activity");
