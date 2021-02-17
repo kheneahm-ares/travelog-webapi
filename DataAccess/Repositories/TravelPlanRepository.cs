@@ -105,6 +105,33 @@ namespace DataAccess.Repositories
             }
         }
 
+        public async Task<bool> EditAsync(TravelPlanDto travelPlanDto, Guid userId)
+        {
+            try
+            {
+                var travelPlanToEdit = await _dbContext.TravelPlans.FindAsync(travelPlanDto.Id);
+                if (travelPlanToEdit == null) throw new Exception("Travel Plan Not Found");
+
+                if (travelPlanToEdit.CreatedById != userId) throw new Exception("Insufficient rights to edit Travel Plan");
+
+                travelPlanToEdit.TravelPlanId = travelPlanDto.Id;
+                travelPlanToEdit.Name = travelPlanDto.Name;
+                travelPlanToEdit.StartDate = travelPlanDto.StartDate;
+                travelPlanToEdit.EndDate = travelPlanDto.EndDate;
+                travelPlanToEdit.Description = travelPlanDto.Description;
+
+                if (!_dbContext.ChangeTracker.HasChanges()) return true;
+
+                var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
+
+                return isSuccessful;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<TravelPlan> GetAsync(Guid travelPlanId)
         {
             try

@@ -39,6 +39,24 @@ namespace TravelogApi.Controllers
                 return BadRequest();
             }
         }
+        [HttpPut]
+        public async Task<IActionResult> Edit([FromBody] TravelPlanDto travelPlanDto)
+        {
+            try
+            {
+                var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
+                var isSuccessful = await _travelPlanRepository.EditAsync(travelPlanDto, new Guid(userId));
+
+                if (!isSuccessful) return StatusCode(500);
+
+                return Ok();
+            }
+            catch (Exception exc)
+            {
+                return BadRequest();
+            }
+        }
+
 
         [HttpDelete]
         public async Task<IActionResult> Delete([FromQuery] string id)
