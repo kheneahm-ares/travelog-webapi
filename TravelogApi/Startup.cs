@@ -25,6 +25,22 @@ namespace TravelogApi
             services.AddDbContext<AppDbContext>(options =>
                                 options.UseSqlServer(connectionString));
 
+            services.AddCors(options =>
+            {
+                //allows any requests from localhost;3000 to get into app
+                //without this requests from any origin will not be allowed to hit
+                //this api
+                options.AddPolicy("TravelogCorsPolicy", policy =>
+                {
+                    policy
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .WithOrigins("http://localhost:3000")
+                        .WithExposedHeaders("WWW-Authenticate")
+                        .AllowCredentials();
+                });
+            });
+
             //use the jwtbearer auth
             services.AddAuthentication("TravelogBearerAuth")
                     .AddJwtBearer("TravelogBearerAuth", config =>
@@ -51,6 +67,7 @@ namespace TravelogApi
             }
 
             app.UseRouting();
+            app.UseCors("TravelogCorsPolicy");
 
             app.UseAuthentication();
             app.UseAuthorization();
