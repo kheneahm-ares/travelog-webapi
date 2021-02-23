@@ -15,5 +15,6 @@ namespace DataAccess.Repositories.Interfaces
         Task<bool> AddTravelerAsync(Guid travelPlanId, Guid loggedInUserId, Guid userId);
         Task<bool> DeleteAsync(Guid travelPlanId, Guid userId);
         Task<TravelPlanDto> GetAsync(Guid travelPlanId);
+        Task<List<TravelPlanDto>> ListAsync(Guid userId);
     }
 }

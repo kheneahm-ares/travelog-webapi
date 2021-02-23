@@ -3,6 +3,8 @@ using Domain.DTOs;
 using Domain.Models;
 using Persistence;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DataAccess.Repositories
@@ -150,6 +152,15 @@ namespace DataAccess.Repositories
             {
                 throw;
             }
+        }
+
+        public async Task<List<TravelPlanDto>> ListAsync(Guid userId)
+        {
+            var travelPlans = _dbContext.TravelPlans.Where((tp) => tp.CreatedById == userId).ToList();
+
+            var lstTravelPlanDto = travelPlans.Select((tp) => new TravelPlanDto(tp)).ToList();
+
+            return lstTravelPlanDto;
         }
     }
 }

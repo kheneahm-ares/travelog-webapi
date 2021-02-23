@@ -110,5 +110,15 @@ namespace TravelogApi.Controllers
 
             return Ok(travelPlanDTO);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> List()
+        {
+            var loggedInUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
+
+            var lstTravelPlanDTO = await _travelPlanRepository.ListAsync(new Guid(loggedInUserId));
+
+            return Ok(lstTravelPlanDTO);
+        }
     }
 }
