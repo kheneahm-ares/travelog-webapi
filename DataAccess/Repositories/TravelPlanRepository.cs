@@ -156,11 +156,18 @@ namespace DataAccess.Repositories
 
         public async Task<List<TravelPlanDto>> ListAsync(Guid userId)
         {
-            var travelPlans = _dbContext.TravelPlans.Where((tp) => tp.CreatedById == userId).ToList();
+            try
+            {
+                var travelPlans = _dbContext.TravelPlans.Where((tp) => tp.CreatedById == userId).ToList();
 
-            var lstTravelPlanDto = travelPlans.Select((tp) => new TravelPlanDto(tp)).ToList();
+                var lstTravelPlanDto = travelPlans.Select((tp) => new TravelPlanDto(tp)).ToList();
 
-            return lstTravelPlanDto;
+                return lstTravelPlanDto;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

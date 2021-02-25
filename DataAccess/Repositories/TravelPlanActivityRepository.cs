@@ -1,8 +1,11 @@
 ﻿using DataAccess.Repositories.Interfaces;
 using Domain.DTOs;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DataAccess.Repositories
@@ -109,6 +112,25 @@ namespace DataAccess.Repositories
                 if (activity == null) throw new Exception("Activity Not Found");
 
                 return new TravelPlanActivityDto(activity);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<TravelPlanActivityDto>> ListAsync(Guid travelPlanId)
+        {
+            try
+            {
+
+                //get all activities for a given travel plan
+                var lstActivities = await _dbContext.TravelPlanActivities.Where((tpa) => tpa.TravelPlanId == travelPlanId).ToListAsync();
+
+                var lstActivityDto = lstActivities.Select((a) => new TravelPlanActivityDto(a)).ToList();
+
+                return lstActivityDto;
+
             }
             catch
             {

@@ -81,5 +81,20 @@ namespace TravelogApi.Controllers
 
             return Ok(activityDto);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> List([FromQuery] string id)
+        {
+            try
+            {
+                var lstActivityDto = await _activityRepository.ListAsync(new Guid(id));
+
+                return Ok(lstActivityDto);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
     }
 }
