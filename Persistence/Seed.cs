@@ -26,7 +26,7 @@ namespace Persistence
                         {
                             new TravelPlanActivity
                             {
-                                Name = "Going to Cafe in Portugal",
+                                Name = "Going to Breakfast in Portugal",
                                 StartTime = DateTime.Now.AddMonths(2).AddDays(1).AddHours(5),
                                 EndTime = DateTime.Now.AddMonths(2).AddDays(1).AddHours(6),
                                 Category = "Food",
@@ -35,27 +35,99 @@ namespace Persistence
                             },
                             new TravelPlanActivity
                             {
-                                Name = "Going to Beach in Portugal",
-                                StartTime = DateTime.Now.AddMonths(2).AddDays(1).AddHours(10),
-                                EndTime = DateTime.Now.AddMonths(2).AddDays(1).AddHours(12),
+                                Name = "Going to Cafe in Portugal",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(2).AddHours(6),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(2).AddHours(7),
+                                Category = "Food",
+                                Location = "Lisbon, Portugal",
+                                HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
+                            },
+                            new TravelPlanActivity
+                            {
+                                Name = "Going to Museum in Portugal",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(3).AddHours(7),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(3).AddHours(8),
+                                Category = "Sightseeing",
+                                Location = "Lisbon, Portugal",
+                                HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
+                            },
+                            new TravelPlanActivity
+                            {
+                                Name = "Going to Bar in Portugal",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(4).AddHours(8),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(4).AddHours(9),
                                 Category = "Fun",
                                 Location = "Lisbon, Portugal",
                                 HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
                             },
                             new TravelPlanActivity
                             {
-                                Name = "Going to Cafe in Spain",
-                                StartTime = DateTime.Now.AddMonths(2).AddDays(2).AddHours(5),
-                                EndTime = DateTime.Now.AddMonths(2).AddDays(2).AddHours(6),
+                                Name = "Going to Club in Portugal",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(5).AddHours(9),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(5).AddHours(10),
+                                Category = "Fun",
+                                Location = "Lisbon, Portugal",
+                                HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
+                            },
+                            new TravelPlanActivity
+                            {
+                                Name = "Going to Beach in Portugal",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(6).AddHours(10),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(6).AddHours(12),
+                                Category = "Fun",
+                                Location = "Lisbon, Portugal",
+                                HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
+                            },
+                            new TravelPlanActivity
+                            {
+                                Name = "Going to Breakfast in Spain",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(7).AddHours(5),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(7).AddHours(6),
                                 Category = "Food",
                                 Location = "Madrid, Spain",
                                 HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
                             },
                             new TravelPlanActivity
                             {
+                                Name = "Going to Cafe in Spain",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(8).AddHours(6),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(8).AddHours(7),
+                                Category = "Food",
+                                Location = "Madrid, Spain",
+                                HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
+                            },
+                            new TravelPlanActivity
+                            {
+                                Name = "Going to Museum in Spain",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(9).AddHours(7),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(9).AddHours(8),
+                                Category = "Sightseeing",
+                                Location = "Madrid, Spain",
+                                HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
+                            },
+                            new TravelPlanActivity
+                            {
+                                Name = "Going to Bar in Spain",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(10).AddHours(8),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(10).AddHours(9),
+                                Category = "Fun",
+                                Location = "Madrid, Spain",
+                                HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
+                            },
+                            new TravelPlanActivity
+                            {
+                                Name = "Going to Club in Spain",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(11).AddHours(9),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(11).AddHours(10),
+                                Category = "Fun",
+                                Location = "Madrid, Spain",
+                                HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
+                            },
+                            new TravelPlanActivity
+                            {
                                 Name = "Going to Beach in Spain",
-                                StartTime = DateTime.Now.AddMonths(2).AddDays(2).AddHours(10),
-                                EndTime = DateTime.Now.AddMonths(2).AddDays(2).AddHours(12),
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(12).AddHours(10),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(12).AddHours(12),
                                 Category = "Fun",
                                 Location = "Madrid, Spain",
                                 HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
@@ -84,27 +156,72 @@ namespace Persistence
                         {
                             new TravelPlanActivity
                             {
-                                Name = "Going to Cafe in Austin",
-                                StartTime = DateTime.Now.AddMonths(3).AddDays(1).AddHours(5),
-                                EndTime = DateTime.Now.AddMonths(3).AddDays(1).AddHours(6),
+                                Name = "Going to Breakfast in Austin",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(1).AddHours(5),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(1).AddHours(6),
                                 Category = "Food",
                                 Location = "Austin, Texas",
                                 HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
                             },
                             new TravelPlanActivity
                             {
-                                Name = "Going to Mall in Austin",
-                                StartTime = DateTime.Now.AddMonths(3).AddDays(1).AddHours(10),
-                                EndTime = DateTime.Now.AddMonths(3).AddDays(1).AddHours(12),
+                                Name = "Going to Cafe in Austin",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(2).AddHours(6),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(2).AddHours(7),
+                                Category = "Food",
+                                Location = "Austin, Texas",
+                                HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
+                            },
+                            new TravelPlanActivity
+                            {
+                                Name = "Going to Museum in Austin",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(3).AddHours(7),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(3).AddHours(8),
+                                Category = "Sightseeing",
+                                Location = "Austin, Texas",
+                                HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
+                            },
+                            new TravelPlanActivity
+                            {
+                                Name = "Going to Bar in Austin",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(4).AddHours(8),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(4).AddHours(9),
                                 Category = "Fun",
                                 Location = "Austin, Texas",
                                 HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
                             },
                             new TravelPlanActivity
                             {
+                                Name = "Going to Club in Austin",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(5).AddHours(9),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(5).AddHours(10),
+                                Category = "Fun",
+                                Location = "Austin, Texas",
+                                HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
+                            },
+                            new TravelPlanActivity
+                            {
+                                Name = "Going to Beach in Austin",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(6).AddHours(10),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(6).AddHours(12),
+                                Category = "Fun",
+                                Location = "Austin, Texas",
+                                HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
+                            },
+                            new TravelPlanActivity
+                            {
+                                Name = "Going to Breakfast in Dallas",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(7).AddHours(5),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(7).AddHours(6),
+                                Category = "Food",
+                                Location = "Dallas, Texas",
+                                HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
+                            },
+                            new TravelPlanActivity
+                            {
                                 Name = "Going to Cafe in Dallas",
-                                StartTime = DateTime.Now.AddMonths(3).AddDays(2).AddHours(5),
-                                EndTime = DateTime.Now.AddMonths(3).AddDays(2).AddHours(6),
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(8).AddHours(6),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(8).AddHours(7),
                                 Category = "Food",
                                 Location = "Dallas, Texas",
                                 HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
@@ -112,8 +229,35 @@ namespace Persistence
                             new TravelPlanActivity
                             {
                                 Name = "Going to Museum in Dallas",
-                                StartTime = DateTime.Now.AddMonths(3).AddDays(2).AddHours(10),
-                                EndTime = DateTime.Now.AddMonths(3).AddDays(2).AddHours(12),
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(9).AddHours(7),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(9).AddHours(8),
+                                Category = "Sightseeing",
+                                Location = "Dallas, Texas",
+                                HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
+                            },
+                            new TravelPlanActivity
+                            {
+                                Name = "Going to Bar in Dallas",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(10).AddHours(8),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(10).AddHours(9),
+                                Category = "Fun",
+                                Location = "Dallas, Texas",
+                                HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
+                            },
+                            new TravelPlanActivity
+                            {
+                                Name = "Going to Club in Dallas",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(11).AddHours(9),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(11).AddHours(10),
+                                Category = "Fun",
+                                Location = "Dallas, Texas",
+                                HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
+                            },
+                            new TravelPlanActivity
+                            {
+                                Name = "Going to Beach in Dallas",
+                                StartTime = DateTime.Now.AddMonths(2).AddDays(12).AddHours(10),
+                                EndTime = DateTime.Now.AddMonths(2).AddDays(12).AddHours(12),
                                 Category = "Fun",
                                 Location = "Dallas, Texas",
                                 HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
