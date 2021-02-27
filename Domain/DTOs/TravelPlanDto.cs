@@ -25,8 +25,8 @@ namespace Domain.DTOs
         {
             this.Id = travelPlan.TravelPlanId;
             this.Name = travelPlan.Name;
-            this.StartDate = travelPlan.StartDate;
-            this.EndDate = travelPlan.EndDate;
+            this.StartDate = DateTime.SpecifyKind(travelPlan.StartDate, DateTimeKind.Utc);
+            this.EndDate = DateTime.SpecifyKind(travelPlan.EndDate, DateTimeKind.Utc);
             this.Description = travelPlan.Description;
             this.CreatedById = travelPlan.CreatedById;
         }

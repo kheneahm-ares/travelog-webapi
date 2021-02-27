@@ -1,4 +1,6 @@
-﻿using Domain.Models;
+﻿using Domain.DTOs.Converters;
+using Domain.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,8 +31,8 @@ namespace Domain.DTOs
             this.TravelPlanId = travelPlanActivity.TravelPlanId;
             this.HostId = travelPlanActivity.HostId;
             this.Name = travelPlanActivity.Name;
-            this.StartTime = travelPlanActivity.StartTime;
-            this.EndTime = travelPlanActivity.EndTime;
+            this.StartTime = DateTime.SpecifyKind(travelPlanActivity.StartTime, DateTimeKind.Utc);
+            this.EndTime = DateTime.SpecifyKind(travelPlanActivity.EndTime, DateTimeKind.Utc);
             this.Category = travelPlanActivity.Category;
             this.Location = travelPlanActivity.Location;
         }
