@@ -77,7 +77,7 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<bool> EditAsync(TravelPlanActivityDto activityDto, Guid userId)
+        public async Task<TravelPlanActivityDto> EditAsync(TravelPlanActivityDto activityDto, Guid userId)
         {
             try
             {
@@ -87,15 +87,26 @@ namespace DataAccess.Repositories
                 if (activityToEdit.HostId != userId) throw new Exception("Insufficient rights to edit activity");
 
                 //map lib here
+                activityToEdit.Name = activityDto.Name;
                 activityToEdit.StartTime = activityDto.StartTime;
                 activityToEdit.EndTime = activityDto.EndTime;
                 activityToEdit.Location = activityDto.Location;
                 activityToEdit.Category = activityDto.Category;
 
-                if (!_dbContext.ChangeTracker.HasChanges()) return true;
+                if (!_dbContext.ChangeTracker.HasChanges())
+                {
+                    return activityDto;
+                }
 
                 var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
-                return isSuccessful;
+                if (isSuccessful)
+                {
+                    return new TravelPlanActivityDto(activityToEdit);
+                }
+                else
+                {
+                    throw new Exception("Error saving changes");
+                }
             }
             catch (Exception)
             {
@@ -123,14 +134,12 @@ namespace DataAccess.Repositories
         {
             try
             {
-
                 //get all activities for a given travel plan
-                var lstActivities = await _dbContext.TravelPlanActivities.Where((tpa) => tpa.TravelPlanId == travelPlanId).ToListAsync();
+                var lstActivities = await _dbContext.TravelPlanActivities.Where((tpa) => tpa.TravelPlanId == travelPlanId).OrderBy(a => a.StartTime).ToListAsync();
 
                 var lstActivityDto = lstActivities.Select((a) => new TravelPlanActivityDto(a)).ToList();
 
                 return lstActivityDto;
-
             }
             catch
             {
