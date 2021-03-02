@@ -10,8 +10,8 @@ namespace DataAccess.Repositories.Interfaces
 {
     public interface ITravelPlanRepository
     {
-        Task<bool> CreateAsync(TravelPlanDto travelPlanDto, Guid userId);
-        Task<bool> EditAsync(TravelPlanDto travelPlanDto, Guid userId);
+        Task<TravelPlanDto> CreateAsync(TravelPlanDto travelPlanDto, Guid userId);
+        Task<TravelPlanDto> EditAsync(TravelPlanDto travelPlanDto, Guid userId);
         Task<bool> AddTravelerAsync(Guid travelPlanId, Guid loggedInUserId, Guid userId);
         Task<bool> DeleteAsync(Guid travelPlanId, Guid userId);
         Task<TravelPlanDto> GetAsync(Guid travelPlanId);

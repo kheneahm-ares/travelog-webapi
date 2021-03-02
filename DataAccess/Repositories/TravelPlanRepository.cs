@@ -52,7 +52,7 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<bool> CreateAsync(TravelPlanDto travelPlanDto, Guid userId)
+        public async Task<TravelPlanDto> CreateAsync(TravelPlanDto travelPlanDto, Guid userId)
         {
             try
             {
@@ -77,9 +77,13 @@ namespace DataAccess.Repositories
 
                 await _dbContext.UserTravelPlans.AddAsync(traveler);
 
-                var isSuccesful = await _dbContext.SaveChangesAsync() > 0;
+                var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
 
-                return isSuccesful;
+                if (isSuccessful)
+                {
+                    return new TravelPlanDto(newTravelPlan);
+                }
+                throw new Exception("Problem Editing Travel Plan");
             }
             catch (Exception exc)
             {
@@ -110,7 +114,7 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<bool> EditAsync(TravelPlanDto travelPlanDto, Guid userId)
+        public async Task<TravelPlanDto> EditAsync(TravelPlanDto travelPlanDto, Guid userId)
         {
             try
             {
@@ -126,11 +130,15 @@ namespace DataAccess.Repositories
                 travelPlanToEdit.EndDate = travelPlanDto.EndDate;
                 travelPlanToEdit.Description = travelPlanDto.Description;
 
-                if (!_dbContext.ChangeTracker.HasChanges()) return true;
+                if (!_dbContext.ChangeTracker.HasChanges()) return travelPlanDto;
 
                 var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
 
-                return isSuccessful;
+                if (isSuccessful)
+                {
+                    return new TravelPlanDto(travelPlanToEdit);
+                }
+                throw new Exception("Problem Editing Travel Plan");
             }
             catch (Exception)
             {

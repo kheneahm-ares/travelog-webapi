@@ -28,11 +28,9 @@ namespace TravelogApi.Controllers
             try
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-                var isSuccessful = await _travelPlanRepository.CreateAsync(travelPlanDto, new Guid(userId));
+                var newTravelPlan = await _travelPlanRepository.CreateAsync(travelPlanDto, new Guid(userId));
 
-                if (!isSuccessful) return StatusCode(500);
-
-                return Ok();
+                return Ok(newTravelPlan);
             }
             catch (Exception exc)
             {
@@ -46,11 +44,9 @@ namespace TravelogApi.Controllers
             try
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-                var isSuccessful = await _travelPlanRepository.EditAsync(travelPlanDto, new Guid(userId));
+                var editedTravelPlanDto = await _travelPlanRepository.EditAsync(travelPlanDto, new Guid(userId));
 
-                if (!isSuccessful) return StatusCode(500);
-
-                return Ok();
+                return Ok(editedTravelPlanDto);
             }
             catch (Exception exc)
             {

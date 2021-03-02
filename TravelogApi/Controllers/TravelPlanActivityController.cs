@@ -25,11 +25,9 @@ namespace TravelogApi.Controllers
             try
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-                var isSuccessful = await _activityRepository.CreateAsync(activityDto, new Guid(userId));
+                var newActivity = await _activityRepository.CreateAsync(activityDto, new Guid(userId));
 
-                if (!isSuccessful) return StatusCode(500);
-
-                return Ok();
+                return Ok(newActivity);
             }
             catch (Exception exc)
             {

@@ -19,7 +19,7 @@ namespace DataAccess.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<bool> CreateAsync(TravelPlanActivityDto activityDto, Guid userId)
+        public async Task<TravelPlanActivityDto> CreateAsync(TravelPlanActivityDto activityDto, Guid userId)
         {
             try
             {
@@ -43,8 +43,11 @@ namespace DataAccess.Repositories
                 _dbContext.TravelPlanActivities.Add(newActivity);
 
                 var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
-
-                return isSuccessful;
+                if (isSuccessful)
+                {
+                    return new TravelPlanActivityDto(newActivity);
+                }
+                throw new Exception("Error saving changes");
             }
             catch (Exception)
             {
@@ -103,10 +106,7 @@ namespace DataAccess.Repositories
                 {
                     return new TravelPlanActivityDto(activityToEdit);
                 }
-                else
-                {
-                    throw new Exception("Error saving changes");
-                }
+                throw new Exception("Error saving changes");
             }
             catch (Exception)
             {
