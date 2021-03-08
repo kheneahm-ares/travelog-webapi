@@ -17,6 +17,7 @@ namespace Persistence
         public DbSet<TravelPlan> TravelPlans { get; set; }
         public DbSet<TravelPlanActivity> TravelPlanActivities { get; set; }
         public DbSet<UserTravelPlan> UserTravelPlans { get; set; }
+        public DbSet<Location> Locations { get; set; }
 
 
         protected override void OnModelCreating (ModelBuilder builder)

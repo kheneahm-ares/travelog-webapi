@@ -14,12 +14,13 @@ namespace Domain.Models
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public string Category { get; set; }
-        public string Location { get; set; }
         public Guid HostId { get; set; }
 
 
+        //nav props
         public Guid TravelPlanId { get; set; }
         public TravelPlan TravelPlan{ get; set; }
+        public virtual Location Location { get; set; }
 
     }
 }

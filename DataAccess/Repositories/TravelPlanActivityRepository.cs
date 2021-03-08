@@ -35,7 +35,12 @@ namespace DataAccess.Repositories
                     StartTime = activityDto.StartTime,
                     EndTime = activityDto.EndTime,
                     Category = activityDto.Category,
-                    Location = activityDto.Location,
+                    Location = new Location { 
+                       Address = activityDto.Location.Address ,
+                       Latitude = activityDto.Location.Latitude ,
+                       Longitude = activityDto.Location.Longitude,
+                    },
+
                     HostId = userId,
                     TravelPlanId = activityDto.TravelPlanId
                 };
@@ -93,7 +98,12 @@ namespace DataAccess.Repositories
                 activityToEdit.Name = activityDto.Name;
                 activityToEdit.StartTime = activityDto.StartTime;
                 activityToEdit.EndTime = activityDto.EndTime;
-                activityToEdit.Location = activityDto.Location;
+                activityToEdit.Location = new Location
+                {
+                    Address = activityDto.Location.Address,
+                    Latitude = activityDto.Location.Latitude,
+                    Longitude = activityDto.Location.Longitude,
+                };
                 activityToEdit.Category = activityDto.Category;
 
                 if (!_dbContext.ChangeTracker.HasChanges())
@@ -118,7 +128,7 @@ namespace DataAccess.Repositories
         {
             try
             {
-                var activity = await _dbContext.TravelPlanActivities.FindAsync(activityId);
+                var activity = await _dbContext.TravelPlanActivities.Include(tpa => tpa.Location).FirstOrDefaultAsync(tpa => tpa.TravelPlanActivityId == activityId);
 
                 if (activity == null) throw new Exception("Activity Not Found");
 

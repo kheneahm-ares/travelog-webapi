@@ -18,7 +18,7 @@ namespace Domain.DTOs
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public string Category { get; set; }
-        public string Location { get; set; }
+        public LocationDto Location { get; set; }
 
         public TravelPlanActivityDto()
         {
@@ -34,7 +34,8 @@ namespace Domain.DTOs
             this.StartTime = DateTime.SpecifyKind(travelPlanActivity.StartTime, DateTimeKind.Utc);
             this.EndTime = DateTime.SpecifyKind(travelPlanActivity.EndTime, DateTimeKind.Utc);
             this.Category = travelPlanActivity.Category;
-            this.Location = travelPlanActivity.Location;
+            this.Location = new LocationDto(travelPlanActivity.Location);
+  
         }
 
     }
