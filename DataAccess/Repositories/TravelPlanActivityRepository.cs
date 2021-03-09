@@ -41,7 +41,6 @@ namespace DataAccess.Repositories
                         Latitude = activityDto.Location.Latitude,
                         Longitude = activityDto.Location.Longitude,
                     },
-
                     HostId = userId,
                     TravelPlanId = activityDto.TravelPlanId
                 };
@@ -90,7 +89,9 @@ namespace DataAccess.Repositories
         {
             try
             {
-                var activityToEdit = await _dbContext.TravelPlanActivities.FindAsync(activityDto.Id);
+                var activityToEdit = await _dbContext.TravelPlanActivities
+                                                     .Include(tpa => tpa.Location)
+                                                     .FirstOrDefaultAsync(tpa => tpa.TravelPlanActivityId == activityDto.Id);
 
                 if (activityToEdit == null) throw new Exception("Activity not found");
                 if (activityToEdit.HostId != userId) throw new Exception("Insufficient rights to edit activity");
@@ -99,12 +100,9 @@ namespace DataAccess.Repositories
                 activityToEdit.Name = activityDto.Name;
                 activityToEdit.StartTime = activityDto.StartTime;
                 activityToEdit.EndTime = activityDto.EndTime;
-                activityToEdit.Location = new Location
-                {
-                    Address = activityDto.Location.Address,
-                    Latitude = activityDto.Location.Latitude,
-                    Longitude = activityDto.Location.Longitude,
-                };
+                activityToEdit.Location.Address = activityDto.Location.Address;
+                activityToEdit.Location.Longitude = activityDto.Location.Longitude;
+                activityToEdit.Location.Latitude = activityDto.Location.Latitude;
                 activityToEdit.Category = activityDto.Category;
 
                 if (!_dbContext.ChangeTracker.HasChanges())
