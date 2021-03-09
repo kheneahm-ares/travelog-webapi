@@ -35,10 +35,11 @@ namespace DataAccess.Repositories
                     StartTime = activityDto.StartTime,
                     EndTime = activityDto.EndTime,
                     Category = activityDto.Category,
-                    Location = new Location { 
-                       Address = activityDto.Location.Address ,
-                       Latitude = activityDto.Location.Latitude ,
-                       Longitude = activityDto.Location.Longitude,
+                    Location = new Location
+                    {
+                        Address = activityDto.Location.Address,
+                        Latitude = activityDto.Location.Latitude,
+                        Longitude = activityDto.Location.Longitude,
                     },
 
                     HostId = userId,
@@ -145,7 +146,10 @@ namespace DataAccess.Repositories
             try
             {
                 //get all activities for a given travel plan
-                var lstActivities = await _dbContext.TravelPlanActivities.Where((tpa) => tpa.TravelPlanId == travelPlanId).OrderBy(a => a.StartTime).ToListAsync();
+                var lstActivities = await _dbContext.TravelPlanActivities
+                                            .Include(tpa => tpa.Location)
+                                            .Where((tpa) => tpa.TravelPlanId == travelPlanId)
+                                            .OrderBy(a => a.StartTime).ToListAsync();
 
                 var lstActivityDto = lstActivities.Select((a) => new TravelPlanActivityDto(a)).ToList();
 
