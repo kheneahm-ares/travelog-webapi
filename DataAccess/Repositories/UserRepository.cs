@@ -51,5 +51,16 @@ namespace DataAccess.Repositories
                 }
             }
         }
+
+        public async Task<UserDto> GetUserAsync(Guid userId)
+        {
+            const string GET_USER_SQL = @"SELECT ID, USERNAME, DISPLAYNAME FROM ASPNETUSERS WHERE ID=@userId";
+
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                var userDto = await connection.QueryFirstAsync<UserDto>(GET_USER_SQL, new { userId = userId });
+                return userDto;
+            }
+        }
     }
 }
