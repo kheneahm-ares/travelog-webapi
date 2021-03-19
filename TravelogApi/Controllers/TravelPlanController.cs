@@ -13,13 +13,18 @@ namespace TravelogApi.Controllers
     {
         private readonly ITravelPlanRepository _travelPlanRepository;
         private readonly IUserTravelPlanRepository _userTravelPlanRepository;
+        private readonly IPlanInvitationRepository _planInvitationRepository;
         private readonly IUserRepository _userRepository;
 
-        public TravelPlanController(ITravelPlanRepository travelPlanRepository, IUserRepository userRepository, IUserTravelPlanRepository userTravelPlanRepository)
+        public TravelPlanController(ITravelPlanRepository travelPlanRepository, 
+                                    IUserRepository userRepository, 
+                                    IUserTravelPlanRepository userTravelPlanRepository,
+                                    IPlanInvitationRepository planInvitationRepository)
         {
             _travelPlanRepository = travelPlanRepository;
             _userRepository = userRepository;
             _userTravelPlanRepository = userTravelPlanRepository;
+            _planInvitationRepository = planInvitationRepository;
         }
 
         [HttpPost]
@@ -94,6 +99,24 @@ namespace TravelogApi.Controllers
             var lstTravelPlanDTO = await _travelPlanRepository.ListAsync(new Guid(loggedInUserId));
 
             return Ok(lstTravelPlanDTO);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateInvitation(Guid userToInvite, Guid travelPlanId)
+        {
+            try
+            {
+                var loggedInUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
+
+                await _planInvitationRepository.InviteUser(new Guid(loggedInUserId), userToInvite, travelPlanId);
+
+                return Ok();
+            }
+            catch
+            { 
+                return BadRequest();
+            }
+
         }
     }
 }
