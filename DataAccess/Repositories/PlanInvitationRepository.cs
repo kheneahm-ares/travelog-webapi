@@ -26,7 +26,7 @@ namespace DataAccess.Repositories
             //get invitation
             var invitation = await _dbContext.PlanInvitations.FindAsync(invitationId);
 
-            if (invitation.InviteeId != invitee)
+            if (invitation?.InviteeId != invitee)
             {
                 throw new Exception("Cannot accept invitation");
             }
@@ -42,7 +42,28 @@ namespace DataAccess.Repositories
                 if (result <= 0)
                 {
                     //log here
+                    throw new Exception("Could not save invitation changes");
                 }
+            }
+        }
+
+        public async Task DeclineInvitation(Guid invitee, int invitationId)
+        {
+            var invitation = await _dbContext.PlanInvitations.FindAsync(invitationId);
+
+            if (invitation == null)
+            {
+                return;
+            }
+
+            //remove invitation from table
+            _dbContext.PlanInvitations.Remove(invitation);
+            var result = await _dbContext.SaveChangesAsync();
+
+            if (result <= 0)
+            {
+                //log here
+                throw new Exception("Could not save invitation changes");
             }
         }
 

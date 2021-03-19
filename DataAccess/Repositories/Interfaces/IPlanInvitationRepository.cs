@@ -10,5 +10,6 @@ namespace DataAccess.Repositories.Interfaces
     {
         Task InviteUser(Guid inviter, Guid invitee, Guid TravelPlanId);
         Task AcceptInvitation(Guid invitee, int invitationId);
+        Task DeclineInvitation(Guid invitee, int invitationId);
     }
 }

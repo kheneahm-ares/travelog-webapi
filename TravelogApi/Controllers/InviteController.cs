@@ -31,5 +31,20 @@ namespace TravelogApi.Controllers
                 return BadRequest();
             }
         }
+        public async Task<IActionResult> Decline(int inviteId)
+        {
+            try
+            {
+                var loggedInUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
+
+                await _planInvitationRepository.DeclineInvitation(new Guid(loggedInUserId), inviteId);
+
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
     }
 }
