@@ -55,6 +55,7 @@ namespace TravelogApi
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserTravelPlanRepository, UserTravelPlanRepository>();
             services.AddScoped<ITravelPlanActivityRepository, TravelPlanActivityRepository>();
+            services.AddScoped<IPlanInvitationRepository, PlanInvitationRepository>();
 
             services.AddControllers();
         }
