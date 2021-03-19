@@ -72,27 +72,6 @@ namespace TravelogApi.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddTraveler([FromQuery] string travelPlanId, [FromQuery] string userId)
-        {
-            try
-            {
-                var loggedInUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-
-                var isSuccessful = await _travelPlanRepository.AddTravelerAsync(new Guid(travelPlanId),
-                                                                                new Guid(loggedInUserId),
-                                                                                new Guid(userId));
-
-                if (!isSuccessful) return StatusCode(500);
-
-                return Ok();
-            }
-            catch (Exception exc)
-            {
-                return BadRequest();
-            }
-        }
-
         [HttpGet]
         public async Task<IActionResult> Details([FromQuery] string id)
         {

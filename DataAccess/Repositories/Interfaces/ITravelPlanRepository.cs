@@ -12,7 +12,7 @@ namespace DataAccess.Repositories.Interfaces
     {
         Task<TravelPlanDto> CreateAsync(TravelPlanDto travelPlanDto, Guid userId);
         Task<TravelPlanDto> EditAsync(TravelPlanDto travelPlanDto, Guid userId);
-        Task<bool> AddTravelerAsync(Guid travelPlanId, Guid loggedInUserId, Guid userId);
+        Task<bool> AddTravelerAsync(Guid travelPlanId, Guid userToAddId);
         Task<bool> DeleteAsync(Guid travelPlanId, Guid userId);
         Task<TravelPlanDto> GetAsync(Guid travelPlanId);
         Task<List<TravelPlanDto>> ListAsync(Guid userId);
