@@ -2,9 +2,6 @@
 using Domain.Models;
 using Persistence;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccess.Repositories
@@ -13,13 +10,43 @@ namespace DataAccess.Repositories
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserRepository _userRepository;
+        private readonly ITravelPlanRepository _travelPlanRepository;
 
-        public PlanInvitationRepository(AppDbContext dbContext, IUserRepository userRepository)
+        public PlanInvitationRepository(AppDbContext dbContext,
+                                        IUserRepository userRepository,
+                                        ITravelPlanRepository travelPlanRepository)
         {
             _dbContext = dbContext;
             _userRepository = userRepository;
+            _travelPlanRepository = travelPlanRepository;
         }
-        public async Task<bool> InviteUser(Guid inviter, Guid invitee, Guid travelPlanId)
+
+        public async Task AcceptInvitation(Guid invitee, int invitationId)
+        {
+            //get invitation
+            var invitation = await _dbContext.PlanInvitations.FindAsync(invitationId);
+
+            if (invitation.InviteeId != invitee)
+            {
+                throw new Exception("Cannot accept invitation");
+            }
+
+            var isSuccessful = await _travelPlanRepository.AddTravelerAsync(invitation.TravelPlanId, invitee);
+
+            if (isSuccessful)
+            {
+                //after we added the user, remove the invitation
+                _dbContext.PlanInvitations.Remove(invitation);
+                var result = await _dbContext.SaveChangesAsync();
+
+                if (result <= 0)
+                {
+                    //log here
+                }
+            }
+        }
+
+        public async Task InviteUser(Guid inviter, Guid invitee, Guid travelPlanId)
         {
             try
             {
@@ -52,27 +79,15 @@ namespace DataAccess.Repositories
                 _dbContext.PlanInvitations.Add(newInvitation);
                 var result = await _dbContext.SaveChangesAsync();
 
-                if(result > 0)
-                {
-                    //log
-                    return true;
-                }
-                else
+                if (result <= 0)
                 {
                     throw new Exception("Could not add invitation in db");
                 }
-
             }
             catch (Exception)
             {
-
                 throw;
             }
-        }
-
-        public Task<bool> RemoveUser(Guid inviter, Guid invitee, Guid travelPlanId)
-        {
-            throw new NotImplementedException();
         }
     }
 }

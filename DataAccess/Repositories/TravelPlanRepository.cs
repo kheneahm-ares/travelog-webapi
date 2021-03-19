@@ -20,7 +20,7 @@ namespace DataAccess.Repositories
             _userRepository = userRepository;
         }
 
-        public async Task<bool> AddTravelerAsync(Guid travelPlanId, Guid loggedInUserId, Guid userId)
+        public async Task<bool> AddTravelerAsync(Guid travelPlanId, Guid userToAddId)
         {
             try
             {
@@ -28,15 +28,14 @@ namespace DataAccess.Repositories
                 var travelPlan = await _dbContext.TravelPlans.FindAsync(travelPlanId);
                 if (travelPlan == null) throw new Exception("Travel Plan Not Found");
 
-                if (travelPlan.CreatedById != loggedInUserId) throw new Exception("Insufficient rights to add traveler");
 
                 //check if user exists
-                var userExists = await _userRepository.DoesUserExistsAsync(userId);
+                var userExists = await _userRepository.DoesUserExistsAsync(userToAddId);
                 if (!userExists) throw new Exception("Invalid User Id");
 
                 var newUserTravelPlan = new UserTravelPlan
                 {
-                    UserId = userId,
+                    UserId = userToAddId,
                     TravelPlanId = travelPlanId
                 };
 
