@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using DataAccess.CustomExceptions;
 
 namespace TravelogApi.Controllers
 {
@@ -111,6 +112,13 @@ namespace TravelogApi.Controllers
                 await _planInvitationRepository.InviteUser(new Guid(loggedInUserId), userToInvite, travelPlanId);
 
                 return Ok();
+            }
+            catch(UserNotFoundException notFoundExc)
+            {
+                return BadRequest(new
+                {
+                    Message = notFoundExc.Message
+                });
             }
             catch
             { 

@@ -3,6 +3,7 @@ using Domain.Models;
 using Persistence;
 using System;
 using System.Threading.Tasks;
+using DataAccess.CustomExceptions;
 
 namespace DataAccess.Repositories
 {
@@ -86,7 +87,7 @@ namespace DataAccess.Repositories
                 if (!inviteeExists)
                 {
                     //log here
-                    throw new Exception("User to add does not exist");
+                    throw new UserNotFoundException("User to add does not exist");
                 }
 
                 var newInvitation = new PlanInvitation
