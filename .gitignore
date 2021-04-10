@@ -350,4 +350,3 @@ MigrationBackup/
 .ionide/
 /TravelogApi/Properties/launchSettings.json
 /TravelogApi/appsettings.json
-*.sln
