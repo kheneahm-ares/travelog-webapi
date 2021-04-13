@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Logging;
 using Persistence;
 
 namespace TravelogApi
@@ -45,7 +46,7 @@ namespace TravelogApi
             services.AddAuthentication("TravelogBearerAuth")
                     .AddJwtBearer("TravelogBearerAuth", config =>
                     {
-                        config.Authority = "https://localhost:5001/";
+                        config.Authority = Configuration["IdentityServerUrl"];
 
                         //who we are, needed by server to check whether token is for this resource
                         config.Audience = "TravelogApi";
@@ -64,6 +65,7 @@ namespace TravelogApi
         {
             if (env.IsDevelopment())
             {
+                IdentityModelEventSource.ShowPII = true; 
                 app.UseDeveloperExceptionPage();
             }
 
