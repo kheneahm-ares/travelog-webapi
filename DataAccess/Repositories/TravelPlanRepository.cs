@@ -1,6 +1,7 @@
 ﻿using DataAccess.Repositories.Interfaces;
 using Domain.DTOs;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
 using System;
 using System.Collections.Generic;
@@ -165,7 +166,11 @@ namespace DataAccess.Repositories
         {
             try
             {
-                var travelPlans = _dbContext.TravelPlans.Where((tp) => tp.CreatedById == userId).ToList();
+                //get travel plans associated with the user, whether they created it or just belong it
+
+                var userTravelPlanIds = await _dbContext.UserTravelPlans.Where(utp => utp.UserId == userId).Select((utp) => utp.TravelPlanId).ToListAsync();
+
+                var travelPlans = await _dbContext.TravelPlans.Where((tp) => userTravelPlanIds.Contains(tp.TravelPlanId)).ToListAsync();
 
                 var lstTravelPlanDto = travelPlans.Select((tp) => new TravelPlanDto(tp)).ToList();
 
