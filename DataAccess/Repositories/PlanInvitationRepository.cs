@@ -1,9 +1,16 @@
-﻿using DataAccess.Repositories.Interfaces;
+﻿using Dapper;
+using DataAccess.CustomExceptions;
+using DataAccess.Repositories.Interfaces;
+using Domain.DTOs;
 using Domain.Models;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Persistence;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using DataAccess.CustomExceptions;
 
 namespace DataAccess.Repositories
 {
@@ -12,14 +19,17 @@ namespace DataAccess.Repositories
         private readonly AppDbContext _dbContext;
         private readonly IUserRepository _userRepository;
         private readonly ITravelPlanRepository _travelPlanRepository;
+        public string ConnectionString { get; }
 
         public PlanInvitationRepository(AppDbContext dbContext,
                                         IUserRepository userRepository,
-                                        ITravelPlanRepository travelPlanRepository)
+                                        ITravelPlanRepository travelPlanRepository,
+                                        IConfiguration configuration)
         {
             _dbContext = dbContext;
             _userRepository = userRepository;
             _travelPlanRepository = travelPlanRepository;
+            ConnectionString = configuration.GetConnectionString("TravelogApi");
         }
 
         public async Task AcceptInvitation(Guid invitee, int invitationId)
@@ -111,6 +121,53 @@ namespace DataAccess.Repositories
                 }
             }
             catch (Exception exc)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<PlanInvitationDto>> List(Guid loggedInUserId)
+        {
+            try
+            {
+                //validate user
+                var currUser = await _userRepository.GetUserAsync(loggedInUserId);
+                if (currUser == null)
+                {
+                    //log here
+                    throw new UserNotFoundException("User to add does not exist");
+                }
+
+                //get invitations
+                const string PLAN_INVITATIONS_FOR_USER_SQL = @"SELECT TP.NAME as TravelPlanName, INV.INVITEEID as InviteeId, INV.INVITEDBYID as InvitedById, TP.TRAVELPLANID as TravelPlanId, INV.CREATED as CreatedDate, INV.EXPIRATION as ExpirationDate FROM PLANINVITATIONS INV INNER JOIN TRAVELPLANS TP ON TP.TRAVELPLANID = INV.TRAVELPLANID WHERE INV.INVITEEID=@loggedInUserId";
+
+                List<PlanInvitationDto> userInvitations;
+                using (SqlConnection connection = new SqlConnection(ConnectionString))
+                {
+                    var enumerablInvs = await connection
+                                                .QueryAsync<PlanInvitationDto>(PLAN_INVITATIONS_FOR_USER_SQL,
+                                                                                            new { loggedInUserId = loggedInUserId });
+                    userInvitations = enumerablInvs.ToList();
+                }
+
+                if(userInvitations == null)
+                {
+                    return new List<PlanInvitationDto>();
+                }
+
+                //get the inviters username
+                foreach (var inv in userInvitations)
+                {
+                    var inviterUser = await _userRepository.GetUserAsync(inv.InvitedById);
+                    if (inviterUser == null)
+                    {
+                        userInvitations.Remove(inv);
+                    }
+                    inv.InviterUsername = inviterUser.UserName;
+                }
+                return userInvitations;
+            }
+            catch
             {
                 throw;
             }

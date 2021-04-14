@@ -76,6 +76,7 @@ namespace DataAccess.Repositories
 
             using (SqlConnection connection = new SqlConnection(ConnectionString))
             {
+                var sasdf = await connection.QueryFirstAsync(GET_USER_SQL, new { userId = userId });
                 var userDto = await connection.QueryFirstAsync<UserDto>(GET_USER_SQL, new { userId = userId });
                 return userDto;
             }

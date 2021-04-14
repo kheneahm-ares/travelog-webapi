@@ -1,5 +1,6 @@
 ﻿using DataAccess.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -14,6 +15,23 @@ namespace TravelogApi.Controllers
         public InviteController(IPlanInvitationRepository planInvitationRepository)
         {
             _planInvitationRepository = planInvitationRepository;
+        }
+
+        public async Task<IActionResult> List()
+        {
+
+            try
+            {
+                var loggedInUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
+                var userInvitations = await _planInvitationRepository.List(new Guid(loggedInUserId));
+
+                return Ok(userInvitations);
+            }
+            catch (Exception)
+            {
+
+                return BadRequest();
+            }
         }
 
         public async Task<IActionResult> Accept(int inviteId)
@@ -31,6 +49,7 @@ namespace TravelogApi.Controllers
                 return BadRequest();
             }
         }
+
         public async Task<IActionResult> Decline(int inviteId)
         {
             try

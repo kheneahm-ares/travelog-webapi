@@ -9,5 +9,6 @@ namespace Domain.DTOs
     public class TravelerDto : UserDto
     {
 
+
     }
 }

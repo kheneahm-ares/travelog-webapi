@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +9,13 @@ namespace Domain.DTOs
 {
     public class PlanInvitationDto
     {
-        public int Id { get; set; }
-        public Guid InvitedById { get; set; } //who invited
+        public string TravelPlanName { get; set; }
+        public string InviterUsername { get; set; }
+
         public Guid InviteeId { get; set; } //who to invite
+        public Guid InvitedById { get; set; } //who invited
         public Guid TravelPlanId { get; set; }
+
         public DateTime CreatedDate { get; set; }
         public DateTime ExpirationDate { get; set; }
 
