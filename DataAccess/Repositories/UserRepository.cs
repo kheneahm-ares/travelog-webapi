@@ -33,7 +33,7 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<bool> DoesUserExistsAsync(Guid userId)
+        public async Task<bool> DoesUserExistAsync(Guid userId)
         {
             const string USER_EXISTS_SQL = @"SELECT 1 FROM ASPNETUSERS WHERE ID=@userId";
 
@@ -43,6 +43,24 @@ namespace DataAccess.Repositories
                 try
                 {
                     await connection.QueryFirstAsync<int>(USER_EXISTS_SQL, new { userId = userId });
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+        public async Task<bool> DoesUserExistAsync(string username)
+        {
+            const string USER_EXISTS_SQL = @"SELECT 1 FROM ASPNETUSERS WHERE UserName=@username";
+
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                //queryfirst throws exception if not exists
+                try
+                {
+                    await connection.QueryFirstAsync<int>(USER_EXISTS_SQL, new { username = username });
                     return true;
                 }
                 catch
@@ -61,6 +79,25 @@ namespace DataAccess.Repositories
                 var userDto = await connection.QueryFirstAsync<UserDto>(GET_USER_SQL, new { userId = userId });
                 return userDto;
             }
+        }
+
+        public async Task<UserDto> GetUserAsync(string username)
+        {
+            const string GET_USER_SQL = @"SELECT ID, USERNAME, DISPLAYNAME FROM ASPNETUSERS WHERE UserName=@username";
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConnectionString))
+                {
+                    var userDto = await connection.QueryFirstOrDefaultAsync<UserDto>(GET_USER_SQL, new { username = username });
+                    return userDto;
+                }
+            }
+            catch(Exception exc)
+            {
+                throw;
+            }
+
         }
     }
 }

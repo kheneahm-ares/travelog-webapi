@@ -1,11 +1,11 @@
-﻿using DataAccess.Repositories.Interfaces;
+﻿using DataAccess.CustomExceptions;
+using DataAccess.Repositories.Interfaces;
 using Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using DataAccess.CustomExceptions;
 
 namespace TravelogApi.Controllers
 {
@@ -17,8 +17,8 @@ namespace TravelogApi.Controllers
         private readonly IPlanInvitationRepository _planInvitationRepository;
         private readonly IUserRepository _userRepository;
 
-        public TravelPlanController(ITravelPlanRepository travelPlanRepository, 
-                                    IUserRepository userRepository, 
+        public TravelPlanController(ITravelPlanRepository travelPlanRepository,
+                                    IUserRepository userRepository,
                                     IUserTravelPlanRepository userTravelPlanRepository,
                                     IPlanInvitationRepository planInvitationRepository)
         {
@@ -54,6 +54,13 @@ namespace TravelogApi.Controllers
 
                 return Ok(editedTravelPlanDto);
             }
+            catch (InsufficientRightsException insufRights)
+            {
+                return BadRequest(new
+                {
+                    Message = insufRights.Message
+                });
+            }
             catch (Exception exc)
             {
                 return BadRequest();
@@ -72,6 +79,13 @@ namespace TravelogApi.Controllers
 
                 return Ok();
             }
+            catch (InsufficientRightsException insufRights)
+            {
+                return BadRequest(new
+                {
+                    Message = insufRights.Message
+                });
+            }
             catch (Exception exc)
             {
                 return BadRequest();
@@ -81,15 +95,22 @@ namespace TravelogApi.Controllers
         [HttpGet]
         public async Task<IActionResult> Details([FromQuery] string id)
         {
-            var travelPlanId = new Guid(id);
+            try
+            {
+                var travelPlanId = new Guid(id);
 
-            var travelers = await _userTravelPlanRepository.GetTravelersForActivityAsync(travelPlanId);
-            var userTravelers = await _userRepository.GetUsersAsync(travelers);
-            var travelPlanDTO = await _travelPlanRepository.GetAsync(travelPlanId);
+                var travelers = await _userTravelPlanRepository.GetTravelersForActivityAsync(travelPlanId);
+                var userTravelers = await _userRepository.GetUsersAsync(travelers);
+                var travelPlanDTO = await _travelPlanRepository.GetAsync(travelPlanId);
 
-            travelPlanDTO.Travelers = userTravelers.ToList();
+                travelPlanDTO.Travelers = userTravelers.ToList();
 
-            return Ok(travelPlanDTO);
+                return Ok(travelPlanDTO);
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         [HttpGet]
@@ -103,17 +124,24 @@ namespace TravelogApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateInvitation(Guid userToInvite, Guid travelPlanId)
+        public async Task<IActionResult> CreateInvitation(string inviteeUsername, Guid travelPlanId)
         {
             try
             {
                 var loggedInUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
 
-                await _planInvitationRepository.InviteUser(new Guid(loggedInUserId), userToInvite, travelPlanId);
+                await _planInvitationRepository.InviteUser(new Guid(loggedInUserId), inviteeUsername, travelPlanId);
 
                 return Ok();
             }
-            catch(UserNotFoundException notFoundExc)
+            catch (InsufficientRightsException insufRights)
+            {
+                return BadRequest(new
+                {
+                    Message = insufRights.Message
+                });
+            }
+            catch (UserNotFoundException notFoundExc)
             {
                 return BadRequest(new
                 {
@@ -121,10 +149,9 @@ namespace TravelogApi.Controllers
                 });
             }
             catch
-            { 
+            {
                 return BadRequest();
             }
-
         }
     }
 }

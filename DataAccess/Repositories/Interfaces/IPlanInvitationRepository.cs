@@ -8,7 +8,7 @@ namespace DataAccess.Repositories.Interfaces
 {
     public interface IPlanInvitationRepository
     {
-        Task InviteUser(Guid inviter, Guid invitee, Guid TravelPlanId);
+        Task InviteUser(Guid inviter, string inviteeUsername, Guid TravelPlanId);
         Task AcceptInvitation(Guid invitee, int invitationId);
         Task DeclineInvitation(Guid invitee, int invitationId);
     }

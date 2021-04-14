@@ -11,6 +11,8 @@ namespace DataAccess.Repositories.Interfaces
     {
         Task<IEnumerable<UserDto>> GetUsersAsync(IEnumerable<Guid> userIds);
         Task<UserDto> GetUserAsync(Guid userId);
-        Task<bool> DoesUserExistsAsync(Guid userId);
+        Task<UserDto> GetUserAsync(string username);
+        Task<bool> DoesUserExistAsync(Guid userId);
+        Task<bool> DoesUserExistAsync(string username);
     }
 }

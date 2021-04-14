@@ -9,8 +9,8 @@ namespace Domain.Models
     public class PlanInvitation
     {
         public int Id { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime ExpirationDate { get; set; }
+        public DateTime Created { get; set; }
+        public DateTime Expiration { get; set; }
         public Guid InvitedById { get; set; } //who invited
         public Guid InviteeId { get; set; } //who to invite
 

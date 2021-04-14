@@ -1,4 +1,5 @@
-﻿using DataAccess.Repositories.Interfaces;
+﻿using DataAccess.CustomExceptions;
+using DataAccess.Repositories.Interfaces;
 using Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -45,6 +46,13 @@ namespace TravelogApi.Controllers
 
                 return Ok(editedActivityDto);
             }
+            catch (InsufficientRightsException insufRights)
+            {
+                return BadRequest(new
+                {
+                    message = insufRights.Message
+                });
+            }
             catch (Exception exc)
             {
                 return BadRequest();
@@ -62,6 +70,13 @@ namespace TravelogApi.Controllers
                 if (!isSuccessful) return StatusCode(500);
 
                 return Ok();
+            }
+            catch (InsufficientRightsException insufRights)
+            {
+                return BadRequest(new
+                {
+                    message = insufRights.Message
+                });
             }
             catch (Exception exc)
             {

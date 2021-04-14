@@ -56,6 +56,10 @@ namespace DataAccess.Repositories
             {
                 return;
             }
+            if (invitation?.InviteeId != invitee)
+            {
+                throw new Exception("Cannot delete invitation");
+            }
 
             //remove invitation from table
             _dbContext.PlanInvitations.Remove(invitation);
@@ -68,7 +72,7 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task InviteUser(Guid inviter, Guid invitee, Guid travelPlanId)
+        public async Task InviteUser(Guid inviter, string inviteeUsername, Guid travelPlanId)
         {
             try
             {
@@ -79,12 +83,12 @@ namespace DataAccess.Repositories
                 if (travelPlan.CreatedById != inviter)
                 {
                     //log here
-                    throw new Exception("User doesn't have rights to add to travelplan");
+                    throw new InsufficientRightsException("User doesn't have rights to add to travelplan");
                 }
 
                 //validate invitee exists
-                var inviteeExists = await _userRepository.DoesUserExistsAsync(invitee);
-                if (!inviteeExists)
+                var userToInvite = await _userRepository.GetUserAsync(inviteeUsername);
+                if (userToInvite == null)
                 {
                     //log here
                     throw new UserNotFoundException("User to add does not exist");
@@ -92,10 +96,10 @@ namespace DataAccess.Repositories
 
                 var newInvitation = new PlanInvitation
                 {
-                    CreatedDate = DateTime.UtcNow,
-                    ExpirationDate = DateTime.UtcNow.AddDays(7),
+                    Created = DateTime.UtcNow,
+                    Expiration = DateTime.UtcNow.AddDays(7),
                     InvitedById = inviter,
-                    InviteeId = invitee,
+                    InviteeId = new Guid(userToInvite.Id),
                     TravelPlanId = travelPlanId
                 };
                 _dbContext.PlanInvitations.Add(newInvitation);
@@ -106,7 +110,7 @@ namespace DataAccess.Repositories
                     throw new Exception("Could not add invitation in db");
                 }
             }
-            catch (Exception)
+            catch (Exception exc)
             {
                 throw;
             }

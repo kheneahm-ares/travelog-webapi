@@ -1,4 +1,5 @@
-﻿using DataAccess.Repositories.Interfaces;
+﻿using DataAccess.CustomExceptions;
+using DataAccess.Repositories.Interfaces;
 using Domain.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +32,7 @@ namespace DataAccess.Repositories
 
 
                 //check if user exists
-                var userExists = await _userRepository.DoesUserExistsAsync(userToAddId);
+                var userExists = await _userRepository.DoesUserExistAsync(userToAddId);
                 if (!userExists) throw new Exception("Invalid User Id");
 
                 var newUserTravelPlan = new UserTravelPlan
@@ -99,7 +100,7 @@ namespace DataAccess.Repositories
 
                 if (travelPlanToDelete == null) return true;
 
-                if (travelPlanToDelete.CreatedById != userId) throw new Exception("Don't have permission to delete");
+                if (travelPlanToDelete.CreatedById != userId) throw new InsufficientRightsException("Insufficient rights to delete Travel Plan");
 
                 //let EF core cascade delete and delete relations with dependent tables via collection nav properties
                 _dbContext.Remove(travelPlanToDelete);
@@ -121,7 +122,7 @@ namespace DataAccess.Repositories
                 var travelPlanToEdit = await _dbContext.TravelPlans.FindAsync(travelPlanDto.Id);
                 if (travelPlanToEdit == null) throw new Exception("Travel Plan Not Found");
 
-                if (travelPlanToEdit.CreatedById != userId) throw new Exception("Insufficient rights to edit Travel Plan");
+                if (travelPlanToEdit.CreatedById != userId) throw new InsufficientRightsException("Insufficient rights to edit Travel Plan");
 
                 //map here
                 travelPlanToEdit.TravelPlanId = travelPlanDto.Id;

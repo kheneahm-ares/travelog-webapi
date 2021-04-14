@@ -1,4 +1,5 @@
-﻿using DataAccess.Repositories.Interfaces;
+﻿using DataAccess.CustomExceptions;
+using DataAccess.Repositories.Interfaces;
 using Domain.DTOs;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -71,7 +72,7 @@ namespace DataAccess.Repositories
                     //log maybe?
                     return true;
                 }
-                if (activityToDelete.HostId != userId) throw new Exception("Dont have permission to delete");
+                if (activityToDelete.HostId != userId) throw new InsufficientRightsException("Insufficient rights to delete activity");
 
                 _dbContext.TravelPlanActivities.Remove(activityToDelete);
 
@@ -94,7 +95,7 @@ namespace DataAccess.Repositories
                                                      .FirstOrDefaultAsync(tpa => tpa.TravelPlanActivityId == activityDto.Id);
 
                 if (activityToEdit == null) throw new Exception("Activity not found");
-                if (activityToEdit.HostId != userId) throw new Exception("Insufficient rights to edit activity");
+                if (activityToEdit.HostId != userId) throw new InsufficientRightsException("Insufficient rights to edit activity");
 
                 //map lib here
                 activityToEdit.Name = activityDto.Name;
