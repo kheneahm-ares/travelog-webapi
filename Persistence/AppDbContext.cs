@@ -25,6 +25,7 @@ namespace Persistence
 
             //create composite key and use as primary key
             builder.Entity<UserTravelPlan>(config => config.HasKey(ua => new { ua.UserId, ua.TravelPlanId }));
+            builder.Entity<PlanInvitation>(config => config.HasAlternateKey(inv => new {inv.InvitedById, inv.InviteeId, inv.TravelPlanId }));
 
         }
 
