@@ -116,11 +116,18 @@ namespace TravelogApi.Controllers
         [HttpGet]
         public async Task<IActionResult> List()
         {
-            var loggedInUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
+            try
+            {
+                var loggedInUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
 
-            var lstTravelPlanDTO = await _travelPlanRepository.ListAsync(new Guid(loggedInUserId));
+                var lstTravelPlanDTO = await _travelPlanRepository.ListAsync(new Guid(loggedInUserId));
 
-            return Ok(lstTravelPlanDTO);
+                return Ok(lstTravelPlanDTO);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         [HttpPost]
@@ -148,9 +155,19 @@ namespace TravelogApi.Controllers
                     Message = notFoundExc.Message
                 });
             }
-            catch
+            catch (UniqueConstraintException uniqExc)
             {
-                return BadRequest();
+                return BadRequest(new 
+                { 
+                    Message = uniqExc.Message 
+                });
+            }
+            catch (Exception exc)
+            {
+                return BadRequest(new
+                {
+                    Message = "An error occurred sending invitation"
+                });
             }
         }
     }

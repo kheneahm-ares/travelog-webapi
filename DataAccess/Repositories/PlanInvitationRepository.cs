@@ -120,6 +120,18 @@ namespace DataAccess.Repositories
                     throw new Exception("Could not add invitation in db");
                 }
             }
+            catch (DbUpdateException exc)
+            {
+                if(exc.InnerException is SqlException sqlExc)
+                {
+                    switch (sqlExc.Number)
+                    {
+                        case 2627: throw new UniqueConstraintException("Invitation has already been sent");
+                        default: throw;
+                    }
+                }
+
+            }
             catch (Exception exc)
             {
                 throw;
