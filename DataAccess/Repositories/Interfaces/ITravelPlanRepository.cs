@@ -16,5 +16,6 @@ namespace DataAccess.Repositories.Interfaces
         Task<bool> DeleteAsync(Guid travelPlanId, Guid userId);
         Task<TravelPlanDto> GetAsync(Guid travelPlanId);
         Task<List<TravelPlanDto>> ListAsync(Guid userId);
+        Task<bool> RemoveTraveler(Guid loggedInUserId, string travelerUsername, Guid travelPlanId);
     }
 }

@@ -151,7 +151,7 @@ namespace DataAccess.Repositories
                 }
 
                 //get invitations
-                const string PLAN_INVITATIONS_FOR_USER_SQL = @"SELECT TP.NAME as TravelPlanName, INV.INVITEEID as InviteeId, INV.INVITEDBYID as InvitedById, TP.TRAVELPLANID as TravelPlanId, INV.CREATED as CreatedDate, INV.EXPIRATION as ExpirationDate FROM PLANINVITATIONS INV INNER JOIN TRAVELPLANS TP ON TP.TRAVELPLANID = INV.TRAVELPLANID WHERE INV.INVITEEID=@loggedInUserId";
+                const string PLAN_INVITATIONS_FOR_USER_SQL = @"SELECT INV.ID, TP.NAME as TravelPlanName, INV.INVITEEID as InviteeId, INV.INVITEDBYID as InvitedById, TP.TRAVELPLANID as TravelPlanId, INV.CREATED as CreatedDate, INV.EXPIRATION as ExpirationDate FROM PLANINVITATIONS INV INNER JOIN TRAVELPLANS TP ON TP.TRAVELPLANID = INV.TRAVELPLANID WHERE INV.INVITEEID=@loggedInUserId";
 
                 List<PlanInvitationDto> userInvitations;
                 using (SqlConnection connection = new SqlConnection(ConnectionString))

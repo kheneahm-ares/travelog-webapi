@@ -9,6 +9,8 @@ namespace Domain.DTOs
 {
     public class PlanInvitationDto
     {
+        public int Id { get; set; }
+
         public string TravelPlanName { get; set; }
         public string InviterUsername { get; set; }
 

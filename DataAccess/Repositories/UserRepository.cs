@@ -74,11 +74,19 @@ namespace DataAccess.Repositories
         {
             const string GET_USER_SQL = @"SELECT ID, USERNAME, DISPLAYNAME FROM ASPNETUSERS WHERE ID=@userId";
 
-            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            try
             {
-                var sasdf = await connection.QueryFirstAsync(GET_USER_SQL, new { userId = userId });
-                var userDto = await connection.QueryFirstAsync<UserDto>(GET_USER_SQL, new { userId = userId });
-                return userDto;
+                using (SqlConnection connection = new SqlConnection(ConnectionString))
+                {
+                    var sasdf = await connection.QueryFirstAsync(GET_USER_SQL, new { userId = userId });
+                    var userDto = await connection.QueryFirstAsync<UserDto>(GET_USER_SQL, new { userId = userId });
+                    return userDto;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
         }
 

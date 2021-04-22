@@ -182,5 +182,49 @@ namespace DataAccess.Repositories
                 throw;
             }
         }
+
+        public async Task<bool> RemoveTraveler(Guid loggedInUserId, string travelerUsername, Guid travelPlanId)
+        {
+            try
+            {
+                //validate travelplan
+                var travelPlan = await _dbContext.TravelPlans.Where((tp) => tp.TravelPlanId == travelPlanId).Include((tp) => tp.UserTravelPlans).FirstOrDefaultAsync();
+
+                if(travelPlan == null)
+                {
+                    throw new Exception("Travel Plan Not Found");
+                }
+
+                //host can't remove themselves
+                if(travelPlan.CreatedById != loggedInUserId)
+                {
+                    throw new InsufficientRightsException("Insufficient rights to Travel Plan"); 
+                }
+
+                //validate traveler to remove
+                var travelerToRemove = await _userRepository.GetUserAsync(travelerUsername);
+                if(travelerToRemove == null)
+                {
+                    return true;
+                }
+                var userTP = travelPlan.UserTravelPlans.Where((utp) => utp.UserId.ToString() == travelerToRemove.Id).FirstOrDefault();
+
+                //if user actually was never part of the utp then just return
+                if(userTP == null)
+                {
+                    return true;
+                }
+
+                //remove entry tying user to TP
+                _dbContext.UserTravelPlans.Remove(userTP);
+                var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
+
+                return isSuccessful;
+            }
+            catch(Exception exc)
+            {
+                throw;
+            }
+        }
     }
 }

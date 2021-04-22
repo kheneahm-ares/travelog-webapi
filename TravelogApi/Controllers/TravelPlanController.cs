@@ -131,6 +131,44 @@ namespace TravelogApi.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> RemoveTraveler(string travelerUsername, Guid travelPlanId)
+        {
+            try
+            {
+                var loggedInUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
+
+                var isSuccessful = await _travelPlanRepository.RemoveTraveler(new Guid(loggedInUserId), travelerUsername, travelPlanId);
+
+                if(!isSuccessful)
+                {
+                    return BadRequest(new
+                    {
+                        Message = "Could not remove traveler"
+                    });
+                }
+
+                return Ok();
+
+            }
+            catch (InsufficientRightsException insufRights)
+            {
+                return BadRequest(new
+                {
+                    Message = insufRights.Message
+                });
+            }
+            catch (Exception exc)
+            {
+                return BadRequest(new
+                {
+                    Message = "An error occurred sending invitation"
+                });
+
+            }
+
+        }
+
+        [HttpPost]
         public async Task<IActionResult> CreateInvitation(string inviteeUsername, Guid travelPlanId)
         {
             try
