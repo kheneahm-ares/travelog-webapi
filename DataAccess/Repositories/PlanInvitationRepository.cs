@@ -87,7 +87,11 @@ namespace DataAccess.Repositories
             try
             {
                 //get travel plan
-                var travelPlan = await _dbContext.TravelPlans.FindAsync(travelPlanId);
+                var travelPlan = await _dbContext.TravelPlans.Where(tp => tp.TravelPlanId == travelPlanId)
+                                                             .Include((tp) => tp.UserTravelPlans)
+                                                             .FirstOrDefaultAsync();
+
+                
 
                 //validate the inviter is the host
                 if (travelPlan.CreatedById != inviter)
@@ -102,6 +106,12 @@ namespace DataAccess.Repositories
                 {
                     //log here
                     throw new UserNotFoundException("User to add does not exist");
+                }
+
+                //check if user to invite is already part of plan
+                if(travelPlan.UserTravelPlans.Exists((utp) => utp.UserId == new Guid(userToInvite.Id)))
+                {
+                    throw new CommonException("User is already a traveler!");
                 }
 
                 var newInvitation = new PlanInvitation

@@ -200,6 +200,13 @@ namespace TravelogApi.Controllers
                     Message = uniqExc.Message 
                 });
             }
+            catch (CommonException commExc)
+            {
+                return BadRequest(new
+                {
+                    Message = commExc.Message
+                });
+            }
             catch (Exception exc)
             {
                 return BadRequest(new
