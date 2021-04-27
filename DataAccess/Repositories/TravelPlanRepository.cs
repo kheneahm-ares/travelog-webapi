@@ -195,18 +195,15 @@ namespace DataAccess.Repositories
                     throw new Exception("Travel Plan Not Found");
                 }
 
-                //host can't remove themselves
-                if(travelPlan.CreatedById != loggedInUserId)
-                {
-                    throw new InsufficientRightsException("Insufficient rights to Travel Plan"); 
-                }
-
                 //validate traveler to remove
                 var travelerToRemove = await _userRepository.GetUserAsync(travelerUsername);
                 if(travelerToRemove == null)
                 {
                     return true;
                 }
+
+
+
                 var userTP = travelPlan.UserTravelPlans.Where((utp) => utp.UserId.ToString() == travelerToRemove.Id).FirstOrDefault();
 
                 //if user actually was never part of the utp then just return
@@ -215,11 +212,24 @@ namespace DataAccess.Repositories
                     return true;
                 }
 
-                //remove entry tying user to TP
-                _dbContext.UserTravelPlans.Remove(userTP);
-                var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
+                //only hosts have removal rights
+                var isUserHost = loggedInUserId == travelPlan.CreatedById;
+                var userNotHostButIsTraveler = !isUserHost && loggedInUserId.ToString() == travelerToRemove.Id;
 
-                return isSuccessful;
+
+                if (isUserHost || userNotHostButIsTraveler)
+                {
+                    //remove entry tying user to TP
+                    _dbContext.UserTravelPlans.Remove(userTP);
+                    var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
+
+                    return isSuccessful;
+                }
+                else
+                {
+                    throw new InsufficientRightsException("Insufficient rights to Travel Plan");
+                }
+
             }
             catch(Exception exc)
             {
