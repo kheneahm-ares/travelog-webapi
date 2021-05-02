@@ -98,8 +98,14 @@ namespace TravelogApi.Controllers
             try
             {
                 var travelPlanId = new Guid(id);
+                var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
 
                 var travelers = await _userTravelPlanRepository.GetTravelersForActivityAsync(travelPlanId);
+                if (!travelers.Contains(new Guid(userId)))
+                {
+                    return Forbid();
+                }
+
                 var userTravelers = await _userRepository.GetUsersAsync(travelers);
                 var travelPlanDTO = await _travelPlanRepository.GetAsync(travelPlanId);
 
@@ -139,7 +145,7 @@ namespace TravelogApi.Controllers
 
                 var isSuccessful = await _travelPlanRepository.RemoveTraveler(new Guid(loggedInUserId), travelerUsername, travelPlanId);
 
-                if(!isSuccessful)
+                if (!isSuccessful)
                 {
                     return BadRequest(new
                     {
@@ -148,7 +154,6 @@ namespace TravelogApi.Controllers
                 }
 
                 return Ok();
-
             }
             catch (InsufficientRightsException insufRights)
             {
@@ -163,9 +168,7 @@ namespace TravelogApi.Controllers
                 {
                     Message = "An error occurred sending invitation"
                 });
-
             }
-
         }
 
         [HttpPost]
@@ -195,9 +198,9 @@ namespace TravelogApi.Controllers
             }
             catch (UniqueConstraintException uniqExc)
             {
-                return BadRequest(new 
-                { 
-                    Message = uniqExc.Message 
+                return BadRequest(new
+                {
+                    Message = uniqExc.Message
                 });
             }
             catch (CommonException commExc)

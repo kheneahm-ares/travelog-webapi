@@ -34,6 +34,8 @@ namespace TravelogApi.Controllers
             }
         }
 
+
+        [HttpPost]
         public async Task<IActionResult> Accept(int inviteId)
         {
             try
@@ -50,6 +52,7 @@ namespace TravelogApi.Controllers
             }
         }
 
+        [HttpPost]
         public async Task<IActionResult> Decline(int inviteId)
         {
             try

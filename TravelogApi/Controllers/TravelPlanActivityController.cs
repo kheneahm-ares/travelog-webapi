@@ -3,10 +3,8 @@ using DataAccess.Repositories.Interfaces;
 using Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace TravelogApi.Controllers
@@ -14,10 +12,12 @@ namespace TravelogApi.Controllers
     public class TravelPlanActivityController : Controller
     {
         private readonly ITravelPlanActivityRepository _activityRepository;
+        private readonly IUserTravelPlanRepository _userTravelPlanRepository;
 
-        public TravelPlanActivityController(ITravelPlanActivityRepository activityRepository)
+        public TravelPlanActivityController(ITravelPlanActivityRepository activityRepository, IUserTravelPlanRepository userTravelPlanRepository)
         {
             _activityRepository = activityRepository;
+            _userTravelPlanRepository = userTravelPlanRepository;
         }
 
         [HttpPost]
@@ -84,7 +84,6 @@ namespace TravelogApi.Controllers
             }
         }
 
-
         [HttpGet]
         public async Task<IActionResult> Details([FromQuery] string id)
         {
@@ -98,7 +97,23 @@ namespace TravelogApi.Controllers
         {
             try
             {
-                var lstActivityDto = await _activityRepository.ListAsync(new Guid(id));
+                var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
+                var travelPlanId = new Guid(id);
+                var travelers = await _userTravelPlanRepository.GetTravelersForActivityAsync(travelPlanId);
+                if(travelers.Count() == 0)
+                {
+                    //travel plan doesn't exist
+                    return BadRequest(new
+                    {
+                        Message = "Error occurred retrieving activities for travel plan"
+                    });
+                }
+                if (!travelers.Contains(new Guid(userId)))
+                {
+                    return Forbid();
+                }
+
+                var lstActivityDto = await _activityRepository.ListAsync(travelPlanId);
 
                 return Ok(lstActivityDto);
             }
