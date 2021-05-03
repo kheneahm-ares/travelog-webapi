@@ -1,4 +1,5 @@
-﻿using DataAccess.CustomExceptions;
+﻿using DataAccess.Common.Enums;
+using DataAccess.CustomExceptions;
 using DataAccess.Repositories.Interfaces;
 using Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -120,13 +121,14 @@ namespace TravelogApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> List([FromQuery] int? status = null)
         {
             try
             {
+
                 var loggedInUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
 
-                var lstTravelPlanDTO = await _travelPlanRepository.ListAsync(new Guid(loggedInUserId));
+                var lstTravelPlanDTO = await _travelPlanRepository.ListAsync(new Guid(loggedInUserId), status);
 
                 return Ok(lstTravelPlanDTO);
             }

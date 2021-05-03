@@ -173,15 +173,26 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<List<TravelPlanDto>> ListAsync(Guid userId)
+        public async Task<List<TravelPlanDto>> ListAsync(Guid userId, int? status = null)
         {
             try
             {
-                //get travel plans associated with the user, whether they created it or just belong it
 
+                //get travel plans associated with the user, whether they created it or just belong it
                 var userTravelPlanIds = await _dbContext.UserTravelPlans.Where(utp => utp.UserId == userId).Select((utp) => utp.TravelPlanId).ToListAsync();
 
-                var travelPlans = await _dbContext.TravelPlans.Where((tp) => userTravelPlanIds.Contains(tp.TravelPlanId)).ToListAsync();
+                var travelPlans = new List<TravelPlan>();
+
+                //if null, aka not specified get all,
+                //else get specific 
+                if (status == null)
+                {
+                    travelPlans = await _dbContext.TravelPlans.Where((tp) => userTravelPlanIds.Contains(tp.TravelPlanId)).ToListAsync();
+                }
+                else if (Enum.IsDefined(typeof(TravelPlanStatusEnum), status))
+                {
+                    travelPlans = await _dbContext.TravelPlans.Where((tp) => userTravelPlanIds.Contains(tp.TravelPlanId) && tp.TravelPlanStatusId == status).ToListAsync();
+                }
 
                 List<TravelPlanDto> lstTravelPlanDto = new List<TravelPlanDto>();
 

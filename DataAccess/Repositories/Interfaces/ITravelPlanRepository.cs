@@ -1,4 +1,5 @@
-﻿using Domain.DTOs;
+﻿using DataAccess.Common.Enums;
+using Domain.DTOs;
 using Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace DataAccess.Repositories.Interfaces
         Task<bool> AddTravelerAsync(Guid travelPlanId, Guid userToAddId);
         Task<bool> DeleteAsync(Guid travelPlanId, Guid userId);
         Task<TravelPlanDto> GetAsync(Guid travelPlanId);
-        Task<List<TravelPlanDto>> ListAsync(Guid userId);
+        Task<List<TravelPlanDto>> ListAsync(Guid userId, int? status = null);
         Task<bool> RemoveTraveler(Guid loggedInUserId, string travelerUsername, Guid travelPlanId);
     }
 }
