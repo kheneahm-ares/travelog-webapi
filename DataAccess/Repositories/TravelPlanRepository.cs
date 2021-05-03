@@ -147,6 +147,33 @@ namespace DataAccess.Repositories
                 throw;
             }
         }
+        public async Task<bool> SetStatusAsync(Guid travelPlanid, Guid userId, int status)
+        {
+            try
+            {
+                if(!Enum.IsDefined(typeof(TravelPlanStatusEnum), status))
+                {
+                    throw new Exception("Problem Setting Status of Travel Plan");
+                }
+
+                var travelPlanToEdit = await _dbContext.TravelPlans.FindAsync(travelPlanid);
+                if (travelPlanToEdit == null) throw new Exception("Travel Plan Not Found");
+
+                if (travelPlanToEdit.CreatedById != userId) throw new InsufficientRightsException("Insufficient rights to edit Travel Plan");
+
+                travelPlanToEdit.TravelPlanStatusId = status;
+
+                if (!_dbContext.ChangeTracker.HasChanges()) return true;
+
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
 
         public async Task<TravelPlanDto> GetAsync(Guid travelPlanId)
         {
