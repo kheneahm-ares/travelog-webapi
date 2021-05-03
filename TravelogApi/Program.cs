@@ -31,7 +31,7 @@ namespace TravelogApi
 
                     Seed.SeedData(context).GetAwaiter().GetResult();
                 }
-                catch
+                catch(Exception exc)
                 {
                     //log here
                 }

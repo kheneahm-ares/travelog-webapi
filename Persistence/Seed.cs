@@ -1,4 +1,5 @@
-﻿using Domain.Models;
+﻿using DataAccess.Common.Enums;
+using Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,35 @@ namespace Persistence
     {
         public static async Task SeedData(AppDbContext context)
         {
+            if(!context.TravelPlanStatuses.Any())
+            {
+                var travelPlanStatuses = new List<TravelPlanStatus>
+                {
+                    new TravelPlanStatus
+                    {
+                        UniqStatus =  TravelPlanStatusEnum.Created,
+                        Description = TravelPlanStatusEnum.Created.ToString()
+                    },
+                    new TravelPlanStatus
+                    {
+                        UniqStatus = TravelPlanStatusEnum.OnGoing,
+                        Description = TravelPlanStatusEnum.OnGoing.ToString()
+                    },
+                    new TravelPlanStatus
+                    {
+                        UniqStatus =  TravelPlanStatusEnum.Completed,
+                        Description = TravelPlanStatusEnum.Completed.ToString()
+                    },
+                    new TravelPlanStatus
+                    {
+                        UniqStatus = TravelPlanStatusEnum.Archived,
+                        Description = TravelPlanStatusEnum.Archived.ToString()
+                    }
+                };
+                await context.TravelPlanStatuses.AddRangeAsync(travelPlanStatuses);
+                await context.SaveChangesAsync();
+            }
+
             if (!context.TravelPlans.Any())
             {
                 //create travelplans
@@ -22,6 +52,7 @@ namespace Persistence
                         EndDate = DateTime.UtcNow.AddMonths(2).AddDays(7),
                         Description = "Traveling to Europe with friends 2021",
                         CreatedById = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54"),
+                        TravelPlanStatusId = (int) TravelPlanStatusEnum.Created,
                         TravelPlanActivities = new List<TravelPlanActivity>
                         {
                             new TravelPlanActivity
@@ -31,7 +62,7 @@ namespace Persistence
                                 EndTime = DateTime.UtcNow.AddMonths(2).AddDays(1).AddHours(6),
                                 Category = "Food",
                                 Location = new Location() {
-                                    Address = "Lisbon, Portugal", 
+                                    Address = "Lisbon, Portugal",
                                     Latitude = 38.7223,
                                     Longitude = -9.1427},
                                 HostId = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54")
@@ -188,6 +219,7 @@ namespace Persistence
                         EndDate = DateTime.UtcNow.AddMonths(3).AddDays(7),
                         Description = "Traveling to Europe with friends 2021",
                         CreatedById = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54"),
+                        TravelPlanStatusId = (int) TravelPlanStatusEnum.Created,
                         TravelPlanActivities = new List<TravelPlanActivity>
                         {
                             new TravelPlanActivity
@@ -348,6 +380,7 @@ namespace Persistence
                         }
                     }
                 };
+
 
                 await context.TravelPlans.AddRangeAsync(travelPlans);
                 await context.SaveChangesAsync();
