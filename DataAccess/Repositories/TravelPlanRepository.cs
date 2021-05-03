@@ -183,7 +183,21 @@ namespace DataAccess.Repositories
 
                 var travelPlans = await _dbContext.TravelPlans.Where((tp) => userTravelPlanIds.Contains(tp.TravelPlanId)).ToListAsync();
 
-                var lstTravelPlanDto = travelPlans.Select((tp) => new TravelPlanDto(tp)).ToList();
+                List<TravelPlanDto> lstTravelPlanDto = new List<TravelPlanDto>();
+
+                foreach(var tp in travelPlans)
+                {
+                    var tpDto = new TravelPlanDto(tp);
+                    var tpStatus = await _dbContext.TravelPlanStatuses.Where(tps => tps.UniqStatus == (TravelPlanStatusEnum)tp.TravelPlanStatusId).FirstOrDefaultAsync();
+
+                    tpDto.TravelPlanStatus = new TravelPlanStatusDto
+                    {
+                        UniqStatus = tpStatus.UniqStatus,
+                        Description = tpStatus.Description
+                    };
+
+                    lstTravelPlanDto.Add(tpDto); 
+                }
 
                 return lstTravelPlanDto;
             }
