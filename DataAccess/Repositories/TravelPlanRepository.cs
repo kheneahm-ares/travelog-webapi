@@ -1,4 +1,5 @@
-﻿using DataAccess.CustomExceptions;
+﻿using DataAccess.Common.Enums;
+using DataAccess.CustomExceptions;
 using DataAccess.Repositories.Interfaces;
 using Domain.DTOs;
 using Domain.Models;
@@ -29,7 +30,6 @@ namespace DataAccess.Repositories
                 //check if travelplan exists
                 var travelPlan = await _dbContext.TravelPlans.FindAsync(travelPlanId);
                 if (travelPlan == null) throw new Exception("Travel Plan Not Found");
-
 
                 //check if user exists
                 var userExists = await _userRepository.DoesUserExistAsync(userToAddId);
@@ -64,7 +64,8 @@ namespace DataAccess.Repositories
                     Description = travelPlanDto.Description,
                     StartDate = travelPlanDto.StartDate,
                     EndDate = travelPlanDto.EndDate,
-                    CreatedById = userId
+                    CreatedById = userId,
+                    TravelPlanStatusId = (int)TravelPlanStatusEnum.Created
                 };
 
                 await _dbContext.TravelPlans.AddAsync(newTravelPlan);
@@ -155,7 +156,16 @@ namespace DataAccess.Repositories
 
                 if (travelPlan == null) throw new Exception("Travel Plan not found");
 
-                return new TravelPlanDto(travelPlan);
+                var travelPlanDto = new TravelPlanDto(travelPlan);
+                var tpStatus = await _dbContext.TravelPlanStatuses.Where(tps => tps.UniqStatus == (TravelPlanStatusEnum)travelPlan.TravelPlanStatusId).FirstOrDefaultAsync();
+
+                travelPlanDto.TravelPlanStatus = new TravelPlanStatusDto
+                {
+                    UniqStatus = tpStatus.UniqStatus,
+                    Description = tpStatus.Description
+                };
+
+                return travelPlanDto;
             }
             catch
             {
@@ -190,24 +200,22 @@ namespace DataAccess.Repositories
                 //validate travelplan
                 var travelPlan = await _dbContext.TravelPlans.Where((tp) => tp.TravelPlanId == travelPlanId).Include((tp) => tp.UserTravelPlans).FirstOrDefaultAsync();
 
-                if(travelPlan == null)
+                if (travelPlan == null)
                 {
                     throw new Exception("Travel Plan Not Found");
                 }
 
                 //validate traveler to remove
                 var travelerToRemove = await _userRepository.GetUserAsync(travelerUsername);
-                if(travelerToRemove == null)
+                if (travelerToRemove == null)
                 {
                     return true;
                 }
 
-
-
                 var userTP = travelPlan.UserTravelPlans.Where((utp) => utp.UserId.ToString() == travelerToRemove.Id).FirstOrDefault();
 
                 //if user actually was never part of the utp then just return
-                if(userTP == null)
+                if (userTP == null)
                 {
                     return true;
                 }
@@ -215,7 +223,6 @@ namespace DataAccess.Repositories
                 //only hosts have removal rights
                 var isUserHost = loggedInUserId == travelPlan.CreatedById;
                 var userNotHostButIsTraveler = !isUserHost && loggedInUserId.ToString() == travelerToRemove.Id;
-
 
                 if (isUserHost || userNotHostButIsTraveler)
                 {
@@ -229,9 +236,8 @@ namespace DataAccess.Repositories
                 {
                     throw new InsufficientRightsException("Insufficient rights to Travel Plan");
                 }
-
             }
-            catch(Exception exc)
+            catch (Exception exc)
             {
                 throw;
             }

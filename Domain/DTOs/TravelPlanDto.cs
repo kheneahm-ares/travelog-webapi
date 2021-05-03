@@ -16,6 +16,7 @@ namespace Domain.DTOs
         public string Description { get; set; }
         public Guid CreatedById { get; set; }
         public List<UserDto> Travelers { get; set; }
+        public TravelPlanStatusDto TravelPlanStatus { get; set; }
 
         public TravelPlanDto()
         {
