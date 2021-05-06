@@ -20,7 +20,7 @@ namespace TravelogApi.Controllers
         {
             try
             {
-                var statuses = await _travelPlanStatusRepository.List();
+                var statuses = await _travelPlanStatusRepository.ListAsync();
 
                 return Ok(statuses);
             }

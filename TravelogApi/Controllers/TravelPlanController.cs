@@ -74,15 +74,9 @@ namespace TravelogApi.Controllers
             try
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-                var isSuccessful = await _travelPlanRepository.SetStatusAsync(new Guid(id), new Guid(userId), status);
+                var tpIdAndStatusDto = await _travelPlanRepository.SetStatusAsync(new Guid(id), new Guid(userId), status);
 
-                if (isSuccessful)
-                {
-                    return Ok(new { Message = "Successfully updated status" });
-                }
-
-                return BadRequest(new { Message = "Error occurred updating status" });
-
+                return Ok(tpIdAndStatusDto);
             }
             catch (InsufficientRightsException insufRights)
             {
