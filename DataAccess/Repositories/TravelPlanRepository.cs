@@ -16,11 +16,13 @@ namespace DataAccess.Repositories
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserRepository _userRepository;
+        private readonly ITravelPlanStatusRepository _travelPlanStatusRepository;
 
-        public TravelPlanRepository(AppDbContext dbContext, IUserRepository userRepository)
+        public TravelPlanRepository(AppDbContext dbContext, IUserRepository userRepository, ITravelPlanStatusRepository travelPlanStatusRepository)
         {
             _dbContext = dbContext;
             _userRepository = userRepository;
+            _travelPlanStatusRepository = travelPlanStatusRepository;
         }
 
         public async Task<bool> AddTravelerAsync(Guid travelPlanId, Guid userToAddId)
@@ -147,7 +149,7 @@ namespace DataAccess.Repositories
                 throw;
             }
         }
-        public async Task<bool> SetStatusAsync(Guid travelPlanid, Guid userId, int status)
+        public async Task<Dictionary<string, TravelPlanStatusDto>> SetStatusAsync(Guid travelPlanid, Guid userId, int status)
         {
             try
             {
@@ -163,9 +165,17 @@ namespace DataAccess.Repositories
 
                 travelPlanToEdit.TravelPlanStatusId = status;
 
-                if (!_dbContext.ChangeTracker.HasChanges()) return true;
 
-                return await _dbContext.SaveChangesAsync() > 0;
+                var tpStatusDto = await _travelPlanStatusRepository.GetStatusAsync((TravelPlanStatusEnum)status);
+
+                if (!_dbContext.ChangeTracker.HasChanges()) return new Dictionary<string, TravelPlanStatusDto> { { travelPlanid.ToString(), tpStatusDto } };
+
+                var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
+                if(isSuccessful)
+                {
+                    return new Dictionary<string, TravelPlanStatusDto> { { travelPlanid.ToString(), tpStatusDto } };
+                }
+                throw new Exception("Problem occurred saving status of Travel Plan"); 
             }
             catch (Exception)
             {

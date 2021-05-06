@@ -1,4 +1,5 @@
-﻿using Domain.DTOs;
+﻿using DataAccess.Common.Enums;
+using Domain.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace DataAccess.Repositories.Interfaces
 {
     public interface ITravelPlanStatusRepository
     {
-        Task<List<TravelPlanStatusDto>> List(); 
+        Task<List<TravelPlanStatusDto>> ListAsync(); 
+        Task<TravelPlanStatusDto> GetStatusAsync(TravelPlanStatusEnum status);
     }
 }
