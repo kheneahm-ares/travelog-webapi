@@ -11,7 +11,7 @@ namespace Persistence
     {
         public static async Task SeedData(AppDbContext context)
         {
-            if(!context.TravelPlanStatuses.Any())
+            if (!context.TravelPlanStatuses.Any())
             {
                 var travelPlanStatuses = new List<TravelPlanStatus>
                 {
@@ -380,10 +380,51 @@ namespace Persistence
                         }
                     }
                 };
-
-
                 await context.TravelPlans.AddRangeAsync(travelPlans);
                 await context.SaveChangesAsync();
+            }
+
+            if (!context.TPAnnouncements.Any())
+            {
+                var tp = context.TravelPlans.First();
+                var announcements = new List<TPAnnouncement>
+                {
+                    new TPAnnouncement
+                    {
+                        Title = "Things to bring",
+                        Description = "Toothbrush, Tooth paste, extra underwear, extra shoes",
+                        CreatedDate = DateTime.UtcNow.AddDays(1),
+                        CreatedById = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54"),
+                        TravelPlanId = tp.TravelPlanId
+                    },
+                    new TPAnnouncement
+                    {
+                        Title = "Things to watchout for",
+                        Description = "Don't talk to strangers, don't expose your phone",
+                        CreatedDate = DateTime.UtcNow.AddDays(2),
+                        CreatedById = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54"),
+                        TravelPlanId = tp.TravelPlanId
+                    },
+                    new TPAnnouncement
+                    {
+                        Title = "Trip addition!",
+                        Description = "I added an extra activity for x because we have time!",
+                        CreatedDate = DateTime.UtcNow.AddDays(3),
+                        CreatedById = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54"),
+                        TravelPlanId = tp.TravelPlanId
+                    },
+                    new TPAnnouncement
+                    {
+                        Title = "COVID Update",
+                        Description = "Apparently, things are shooting down at x location, we may not be going there during y",
+                        CreatedDate = DateTime.UtcNow.AddDays(4),
+                        CreatedById = new Guid("1a7dbb84-6de2-4bfc-97e0-31ad64c3ed54"),
+                        TravelPlanId = tp.TravelPlanId
+                    }
+                };
+                await context.TPAnnouncements.AddRangeAsync(announcements);
+                await context.SaveChangesAsync();
+
             }
         }
     }

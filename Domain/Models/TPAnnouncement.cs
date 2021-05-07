@@ -10,8 +10,6 @@ namespace Domain.Models
         public DateTime CreatedDate { get; set; }
         public Guid CreatedById { get; set; }
         public Guid TravelPlanId { get; set; }
-        public TravelPlan TravelPlan { get; set; }
         public Guid? TravelPlanActivityId { get; set; }
-        public TravelPlanActivity TravelPlanActivity { get; set; }
     }
 }
