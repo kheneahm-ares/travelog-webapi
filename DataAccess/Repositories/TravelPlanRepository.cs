@@ -224,11 +224,13 @@ namespace DataAccess.Repositories
                 //else get specific 
                 if (status == null)
                 {
-                    travelPlans = await _dbContext.TravelPlans.Where((tp) => userTravelPlanIds.Contains(tp.TravelPlanId)).ToListAsync();
+                    travelPlans = await _dbContext.TravelPlans.Where((tp) => userTravelPlanIds.Contains(tp.TravelPlanId))
+                                                              .OrderBy((tp) => tp.StartDate).ToListAsync();
                 }
                 else if (Enum.IsDefined(typeof(TravelPlanStatusEnum), status))
                 {
-                    travelPlans = await _dbContext.TravelPlans.Where((tp) => userTravelPlanIds.Contains(tp.TravelPlanId) && tp.TravelPlanStatusId == status).ToListAsync();
+                    travelPlans = await _dbContext.TravelPlans.Where((tp) => userTravelPlanIds.Contains(tp.TravelPlanId) && tp.TravelPlanStatusId == status)
+                                                              .OrderBy((tp) => tp.StartDate).ToListAsync();
                 }
 
                 List<TravelPlanDto> lstTravelPlanDto = new List<TravelPlanDto>();
