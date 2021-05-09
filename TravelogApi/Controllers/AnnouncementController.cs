@@ -1,4 +1,5 @@
-﻿using DataAccess.Repositories.Interfaces;
+﻿using DataAccess.CustomExceptions;
+using DataAccess.Repositories.Interfaces;
 using Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -21,8 +22,16 @@ namespace TravelogApi.Controllers
         [HttpGet]
         public async Task<IActionResult> List([FromQuery] Guid travelPlanId)
         {
-            var announcements = await _announcementRepo.ListAsync(travelPlanId);
-            return Ok(announcements);
+            try
+            {
+                var announcements = await _announcementRepo.ListAsync(travelPlanId);
+                return Ok(announcements);
+            }
+            catch (Exception)
+            {
+
+                return BadRequest(new { Message = "Error Occurred" });
+            }
         }
 
         [HttpDelete]
@@ -38,11 +47,19 @@ namespace TravelogApi.Controllers
                 {
                     return Ok();
                 }
-                return BadRequest();
+                return BadRequest(new { Message = "Error Occurred" });
+            }
+            catch (InsufficientRightsException insufExc)
+            {
+                return BadRequest(new { Message = insufExc.Message });
+            }
+            catch (CommonException commExc)
+            {
+                return BadRequest(new { Message = commExc.Message });
             }
             catch (Exception)
             {
-                throw;
+                return BadRequest(new { Message = "Error Occurred" });
             }
         }
 
@@ -56,9 +73,17 @@ namespace TravelogApi.Controllers
                 var announcement = await _announcementRepo.CreateAsync(announcementDto, new Guid(userId));
                 return Ok(announcement);
             }
+            catch (InsufficientRightsException insufExc)
+            {
+                return BadRequest(new { Message = insufExc.Message });
+            }
+            catch (CommonException commExc)
+            {
+                return BadRequest(new { Message = commExc.Message });
+            }
             catch (Exception)
             {
-                throw;
+                return BadRequest(new { Message = "Error Occurred" });
             }
         }
         [HttpPut]
@@ -71,9 +96,17 @@ namespace TravelogApi.Controllers
                 var announcement = await _announcementRepo.EditAsync(announcementDto, new Guid(userId));
                 return Ok(announcement);
             }
+            catch (InsufficientRightsException insufExc)
+            {
+                return BadRequest(new { Message = insufExc.Message });
+            }
+            catch (CommonException commExc)
+            {
+                return BadRequest(new { Message = commExc.Message });
+            }
             catch (Exception)
             {
-                throw;
+                return BadRequest(new { Message = "Error Occurred" });
             }
         }
     }

@@ -25,7 +25,7 @@ namespace Domain.DTOs
             this.Id = tpAnnouncement.Id;
             this.Title = tpAnnouncement.Title;
             this.Description = tpAnnouncement.Description;
-            this.CreatedDate = tpAnnouncement.CreatedDate;
+            this.CreatedDate = DateTime.SpecifyKind(tpAnnouncement.CreatedDate, DateTimeKind.Utc);
             this.CreatedById = tpAnnouncement.CreatedById;
             this.TravelPlanId = tpAnnouncement.TravelPlanId;
             this.TravelPlanActivityId = tpAnnouncement.TravelPlanActivityId;
