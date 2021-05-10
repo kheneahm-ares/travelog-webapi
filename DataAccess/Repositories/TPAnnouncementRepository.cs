@@ -164,7 +164,7 @@ namespace DataAccess.Repositories
                     throw new CommonException("Invalid TravelPlan");
                 }
 
-                var announcements = await _dbContext.TPAnnouncements.Where((tpa) => tpa.TravelPlanId == travelPlanId).OrderBy((tpa) => tpa.CreatedDate).ToListAsync();
+                var announcements = await _dbContext.TPAnnouncements.Where((tpa) => tpa.TravelPlanId == travelPlanId).OrderByDescending((tpa) => tpa.CreatedDate).ToListAsync();
 
                 var announcementDTOs = announcements.Select((a) => new TPAnnouncementDto(a)).ToList();
 
