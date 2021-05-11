@@ -20,11 +20,11 @@ namespace TravelogApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> List([FromQuery] Guid travelPlanId)
+        public async Task<IActionResult> List([FromQuery] Guid travelPlanId, [FromQuery] int limit = 5, [FromQuery] int offset = 0)
         {
             try
             {
-                var announcements = await _announcementRepo.ListAsync(travelPlanId);
+                var announcements = await _announcementRepo.ListAsync(travelPlanId, limit, offset);
                 return Ok(announcements);
             }
             catch (Exception)

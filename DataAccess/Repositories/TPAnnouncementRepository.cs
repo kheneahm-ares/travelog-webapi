@@ -5,9 +5,7 @@ using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccess.Repositories
@@ -22,6 +20,7 @@ namespace DataAccess.Repositories
             _dbContext = dbContext;
             _travelPlanRepository = travelPlanRepository;
         }
+
         public async Task<TPAnnouncementDto> CreateAsync(TPAnnouncementDto announcementDto, Guid loggedInUserId)
         {
             try
@@ -56,7 +55,6 @@ namespace DataAccess.Repositories
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -73,7 +71,7 @@ namespace DataAccess.Repositories
                     return true;
                 }
 
-                if(announcementToDelete.CreatedById != loggedInUserId)
+                if (announcementToDelete.CreatedById != loggedInUserId)
                 {
                     throw new InsufficientRightsException("User doesn't have rights to delete");
                 }
@@ -97,7 +95,7 @@ namespace DataAccess.Repositories
                 //validate announcement exists
                 var announcementToEdit = await _dbContext.TPAnnouncements.FindAsync(announcementDto.Id);
 
-                if(announcementToEdit == null)
+                if (announcementToEdit == null)
                 {
                     throw new CommonException("Invalid Announcement");
                 }
@@ -114,7 +112,6 @@ namespace DataAccess.Repositories
                 announcementToEdit.Description = announcementDto.Description;
                 announcementToEdit.CreatedDate = announcementDto.CreatedDate; //probably create a new column for updated date
 
-
                 if (!_dbContext.ChangeTracker.HasChanges()) return announcementDto;
 
                 var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
@@ -127,7 +124,6 @@ namespace DataAccess.Repositories
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -152,7 +148,7 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<List<TPAnnouncementDto>> ListAsync(Guid travelPlanId)
+        public async Task<AnnouncementEnvelope> ListAsync(Guid travelPlanId, int limit, int offset)
         {
             try
             {
@@ -164,13 +160,25 @@ namespace DataAccess.Repositories
                     throw new CommonException("Invalid TravelPlan");
                 }
 
-                var announcements = await _dbContext.TPAnnouncements.Where((tpa) => tpa.TravelPlanId == travelPlanId).OrderByDescending((tpa) => tpa.CreatedDate).ToListAsync();
+                var annQueryable = _dbContext.TPAnnouncements
+                                    .Where((tpa) => tpa.TravelPlanId == travelPlanId)
+                                    .OrderByDescending((tpa) => tpa.CreatedDate)
+                                    .AsQueryable();
+
+                var announcements = await annQueryable
+                                            .Skip(offset)
+                                            .Take(limit)
+                                            .ToListAsync();
 
                 var announcementDTOs = announcements.Select((a) => new TPAnnouncementDto(a)).ToList();
 
-                return announcementDTOs;
+                return new AnnouncementEnvelope
+                {
+                    AnnouncementDtos = announcementDTOs,
+                    AnnouncementCount = annQueryable.Count()
+                };
             }
-            catch(Exception exc)
+            catch (Exception exc)
             {
                 throw;
             }

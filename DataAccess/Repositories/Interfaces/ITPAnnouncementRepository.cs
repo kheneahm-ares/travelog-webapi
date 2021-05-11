@@ -10,7 +10,7 @@ namespace DataAccess.Repositories.Interfaces
 {
     public interface ITPAnnouncementRepository
     {
-        Task<List<TPAnnouncementDto>> ListAsync(Guid travelPlanId);
+        Task<AnnouncementEnvelope> ListAsync(Guid travelPlanId, int limit, int offset);
         Task<TPAnnouncementDto> GetAsync(Guid announcementId);
         Task<bool> DeleteAsync(Guid announcementId, Guid loggedInUserId);
         Task<TPAnnouncementDto> CreateAsync(TPAnnouncementDto announcementDto, Guid loggedInUserId);
