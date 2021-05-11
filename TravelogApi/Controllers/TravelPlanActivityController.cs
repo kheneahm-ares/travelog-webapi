@@ -1,4 +1,5 @@
-﻿using DataAccess.CustomExceptions;
+﻿using Business.TravelPlan.Interfaces;
+using DataAccess.CustomExceptions;
 using DataAccess.Repositories.Interfaces;
 using Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +12,12 @@ namespace TravelogApi.Controllers
 {
     public class TravelPlanActivityController : Controller
     {
-        private readonly ITravelPlanActivityRepository _activityRepository;
+        private readonly ITPActivityService _activityService;
         private readonly IUserTravelPlanRepository _userTravelPlanRepository;
 
-        public TravelPlanActivityController(ITravelPlanActivityRepository activityRepository, IUserTravelPlanRepository userTravelPlanRepository)
+        public TravelPlanActivityController(ITPActivityService activityService, IUserTravelPlanRepository userTravelPlanRepository)
         {
-            _activityRepository = activityRepository;
+            _activityService = activityService;
             _userTravelPlanRepository = userTravelPlanRepository;
         }
 
@@ -26,7 +27,7 @@ namespace TravelogApi.Controllers
             try
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-                var newActivity = await _activityRepository.CreateAsync(activityDto, new Guid(userId));
+                var newActivity = await _activityService.CreateAsync(activityDto, new Guid(userId));
 
                 return Ok(newActivity);
             }
@@ -42,7 +43,7 @@ namespace TravelogApi.Controllers
             try
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-                var editedActivityDto = await _activityRepository.EditAsync(activityDto, new Guid(userId));
+                var editedActivityDto = await _activityService.EditAsync(activityDto, new Guid(userId));
 
                 return Ok(editedActivityDto);
             }
@@ -65,7 +66,7 @@ namespace TravelogApi.Controllers
             try
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-                var isSuccessful = await _activityRepository.DeleteAsync(new Guid(id), new Guid(userId));
+                var isSuccessful = await _activityService.DeleteAsync(new Guid(id), new Guid(userId));
 
                 if (!isSuccessful) return StatusCode(500);
 
@@ -87,7 +88,7 @@ namespace TravelogApi.Controllers
         [HttpGet]
         public async Task<IActionResult> Details([FromQuery] string id)
         {
-            var activityDto = await _activityRepository.GetAsync(new Guid(id));
+            var activityDto = await _activityService.GetAsync(new Guid(id));
 
             return Ok(activityDto);
         }
@@ -113,7 +114,7 @@ namespace TravelogApi.Controllers
                     return Forbid();
                 }
 
-                var lstActivityDto = await _activityRepository.ListAsync(travelPlanId);
+                var lstActivityDto = await _activityService.ListAsync(travelPlanId);
 
                 return Ok(lstActivityDto);
             }

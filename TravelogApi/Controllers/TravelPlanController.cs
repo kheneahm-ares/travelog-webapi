@@ -14,7 +14,6 @@ namespace TravelogApi.Controllers
     //[Authorize]
     public class TravelPlanController : Controller
     {
-        private readonly ITravelPlanRepository _travelPlanRepository;
         private readonly IUserTravelPlanRepository _userTravelPlanRepository;
         private readonly IPlanInvitationRepository _planInvitationRepository;
         private readonly ITravelPlanService _travelPlanService;
@@ -26,7 +25,6 @@ namespace TravelogApi.Controllers
                                     IPlanInvitationRepository planInvitationRepository,
                                     ITravelPlanService travelPlanService)
         {
-            _travelPlanRepository = travelPlanRepository;
             _userRepository = userRepository;
             _userTravelPlanRepository = userTravelPlanRepository;
             _planInvitationRepository = planInvitationRepository;

@@ -1,35 +1,30 @@
-﻿using DataAccess.Repositories.Interfaces;
+﻿using Business.TravelPlan.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace TravelogApi.Controllers
 {
     public class TravelPlanStatusController : Controller
     {
-        private readonly ITravelPlanStatusRepository _travelPlanStatusRepository;
+        private readonly ITravelPlanStatusService _travelPlanStatusService;
 
-        public TravelPlanStatusController(ITravelPlanStatusRepository travelPlanStatusRepository)
+        public TravelPlanStatusController(ITravelPlanStatusService travelPlanStatusService)
         {
-            _travelPlanStatusRepository = travelPlanStatusRepository;
+            _travelPlanStatusService = travelPlanStatusService;
         }
+
         public async Task<IActionResult> List()
         {
             try
             {
-                var statuses = await _travelPlanStatusRepository.ListAsync();
+                var statuses = await _travelPlanStatusService.ListAsync();
 
                 return Ok(statuses);
             }
             catch
             {
-                throw; 
+                throw;
             }
-
         }
-        
     }
 }

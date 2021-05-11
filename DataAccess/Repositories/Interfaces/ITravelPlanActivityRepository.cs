@@ -1,4 +1,5 @@
 ﻿using Domain.DTOs;
+using Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,10 @@ namespace DataAccess.Repositories.Interfaces
 {
     public interface ITravelPlanActivityRepository
     {
-        Task<TravelPlanActivityDto> CreateAsync(TravelPlanActivityDto activityDto, Guid userId);
+        Task<TravelPlanActivity> CreateAsync(TravelPlanActivity newActivity);
         Task<TravelPlanActivityDto> EditAsync(TravelPlanActivityDto activityDto, Guid userId);
-        Task<bool> DeleteAsync(Guid activityId, Guid userId);
-        Task<TravelPlanActivityDto> GetAsync(Guid activityId);
-        Task<List<TravelPlanActivityDto>> ListAsync(Guid travelPlanId);
+        Task<bool> DeleteAsync(TravelPlanActivity activityToDelete);
+        Task<TravelPlanActivity> GetAsync(Guid activityId);
+        Task<List<TravelPlanActivity>> ListAsync(Guid travelPlanId);
     }
 }

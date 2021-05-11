@@ -20,38 +20,16 @@ namespace DataAccess.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<TravelPlanActivityDto> CreateAsync(TravelPlanActivityDto activityDto, Guid userId)
+        public async Task<TravelPlanActivity> CreateAsync(TravelPlanActivity newActivity)
         {
             try
             {
-                //check if TravelPlan exists
-                var travelPlan = await _dbContext.TravelPlans.FindAsync(activityDto.TravelPlanId);
-
-                if (travelPlan == null) throw new Exception("Travel Plan Not Found");
-
-                //map here
-                var newActivity = new TravelPlanActivity
-                {
-                    Name = activityDto.Name,
-                    StartTime = activityDto.StartTime,
-                    EndTime = activityDto.EndTime,
-                    Category = activityDto.Category,
-                    Location = new Location
-                    {
-                        Address = activityDto.Location.Address,
-                        Latitude = activityDto.Location.Latitude,
-                        Longitude = activityDto.Location.Longitude,
-                    },
-                    HostId = userId,
-                    TravelPlanId = activityDto.TravelPlanId
-                };
-
                 _dbContext.TravelPlanActivities.Add(newActivity);
 
                 var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
                 if (isSuccessful)
                 {
-                    return new TravelPlanActivityDto(newActivity);
+                    return newActivity;
                 }
                 throw new Exception("Error saving changes");
             }
@@ -61,19 +39,10 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<bool> DeleteAsync(Guid activityId, Guid userId)
+        public async Task<bool> DeleteAsync(TravelPlanActivity activityToDelete)
         {
             try
             {
-                var activityToDelete = await _dbContext.TravelPlanActivities.FindAsync(activityId);
-
-                if (activityToDelete == null)
-                {
-                    //log maybe?
-                    return true;
-                }
-                if (activityToDelete.HostId != userId) throw new InsufficientRightsException("Insufficient rights to delete activity");
-
                 _dbContext.TravelPlanActivities.Remove(activityToDelete);
 
                 var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
@@ -124,7 +93,7 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<TravelPlanActivityDto> GetAsync(Guid activityId)
+        public async Task<TravelPlanActivity> GetAsync(Guid activityId)
         {
             try
             {
@@ -132,7 +101,7 @@ namespace DataAccess.Repositories
 
                 if (activity == null) throw new Exception("Activity Not Found");
 
-                return new TravelPlanActivityDto(activity);
+                return activity;
             }
             catch
             {
@@ -140,7 +109,7 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<List<TravelPlanActivityDto>> ListAsync(Guid travelPlanId)
+        public async Task<List<TravelPlanActivity>> ListAsync(Guid travelPlanId)
         {
             try
             {
@@ -150,9 +119,8 @@ namespace DataAccess.Repositories
                                             .Where((tpa) => tpa.TravelPlanId == travelPlanId)
                                             .OrderBy(a => a.StartTime).ToListAsync();
 
-                var lstActivityDto = lstActivities.Select((a) => new TravelPlanActivityDto(a)).ToList();
 
-                return lstActivityDto;
+                return lstActivities;
             }
             catch
             {

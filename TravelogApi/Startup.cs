@@ -68,6 +68,7 @@ namespace TravelogApi
             services.AddScoped<ITravelPlanInvitationService, TravelPlanInvitationService>();
             services.AddScoped<ITravelPlanStatusService, TravelPlanStatusService>();
             services.AddScoped<IUserTravelPlanService, UserTravelPlanService>();
+            services.AddScoped<ITPActivityService, TPActivityService>();
 
             services.AddControllers();
         }
