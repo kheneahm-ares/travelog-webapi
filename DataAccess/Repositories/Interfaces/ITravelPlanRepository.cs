@@ -11,13 +11,12 @@ namespace DataAccess.Repositories.Interfaces
 {
     public interface ITravelPlanRepository
     {
-        Task<TravelPlanDto> CreateAsync(TravelPlanDto travelPlanDto, Guid userId);
-        Task<TravelPlanDto> EditAsync(TravelPlanDto travelPlanDto, Guid userId);
-        Task<Dictionary<string, TravelPlanStatusDto>> SetStatusAsync(Guid travelPlanId,Guid userId, int status);
+        Task<TravelPlan> CreateAsync(TravelPlan newTravelPlan);
+        //Task<TravelPlanDto> EditAsync(TravelPlanDto travelPlanDto, Guid userId);
         Task<bool> AddTravelerAsync(Guid travelPlanId, Guid userToAddId);
-        Task<bool> DeleteAsync(Guid travelPlanId, Guid userId);
-        Task<TravelPlanDto> GetAsync(Guid travelPlanId);
-        Task<List<TravelPlanDto>> ListAsync(Guid userId, int? status = null);
-        Task<bool> RemoveTraveler(Guid loggedInUserId, string travelerUsername, Guid travelPlanId);
+        Task<bool> DeleteAsync(TravelPlan travelPlanToDelete);
+        Task<TravelPlan> GetAsync(Guid travelPlanId, bool includeUTP = false);
+        Task<List<TravelPlan>> GetTravelPlansWithFilterAsync(IEnumerable<Guid> travelPlanIDs, int? status = null);
+        //Task<bool> UpdateTPStatus(TravelPlan travelPlanToEdit, int status);
     }
 }

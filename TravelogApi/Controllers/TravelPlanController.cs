@@ -1,4 +1,5 @@
-﻿using DataAccess.Common.Enums;
+﻿using Business.TravelPlan.Interfaces;
+using DataAccess.Common.Enums;
 using DataAccess.CustomExceptions;
 using DataAccess.Repositories.Interfaces;
 using Domain.DTOs;
@@ -16,17 +17,20 @@ namespace TravelogApi.Controllers
         private readonly ITravelPlanRepository _travelPlanRepository;
         private readonly IUserTravelPlanRepository _userTravelPlanRepository;
         private readonly IPlanInvitationRepository _planInvitationRepository;
+        private readonly ITravelPlanService _travelPlanService;
         private readonly IUserRepository _userRepository;
 
         public TravelPlanController(ITravelPlanRepository travelPlanRepository,
                                     IUserRepository userRepository,
                                     IUserTravelPlanRepository userTravelPlanRepository,
-                                    IPlanInvitationRepository planInvitationRepository)
+                                    IPlanInvitationRepository planInvitationRepository,
+                                    ITravelPlanService travelPlanService)
         {
             _travelPlanRepository = travelPlanRepository;
             _userRepository = userRepository;
             _userTravelPlanRepository = userTravelPlanRepository;
             _planInvitationRepository = planInvitationRepository;
+            _travelPlanService = travelPlanService;
         }
 
         [HttpPost]
@@ -35,7 +39,7 @@ namespace TravelogApi.Controllers
             try
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-                var newTravelPlan = await _travelPlanRepository.CreateAsync(travelPlanDto, new Guid(userId));
+                var newTravelPlan = await _travelPlanService.CreateAsync(travelPlanDto, new Guid(userId));
 
                 return Ok(newTravelPlan);
             }
@@ -51,7 +55,7 @@ namespace TravelogApi.Controllers
             try
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-                var editedTravelPlanDto = await _travelPlanRepository.EditAsync(travelPlanDto, new Guid(userId));
+                var editedTravelPlanDto = await _travelPlanService.EditAsync(travelPlanDto, new Guid(userId));
 
                 return Ok(editedTravelPlanDto);
             }
@@ -74,7 +78,7 @@ namespace TravelogApi.Controllers
             try
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-                var tpIdAndStatusDto = await _travelPlanRepository.SetStatusAsync(new Guid(id), new Guid(userId), status);
+                var tpIdAndStatusDto = await _travelPlanService.SetStatusAsync(new Guid(id), new Guid(userId), status);
 
                 return Ok(tpIdAndStatusDto);
             }
@@ -98,7 +102,7 @@ namespace TravelogApi.Controllers
             try
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-                var isSuccessful = await _travelPlanRepository.DeleteAsync(new Guid(id), new Guid(userId));
+                var isSuccessful = await _travelPlanService.DeleteAsync(new Guid(id), new Guid(userId));
 
                 if (!isSuccessful) return StatusCode(500);
 
@@ -132,7 +136,7 @@ namespace TravelogApi.Controllers
                 }
 
                 var userTravelers = await _userRepository.GetUsersAsync(travelers);
-                var travelPlanDTO = await _travelPlanRepository.GetAsync(travelPlanId);
+                var travelPlanDTO = await _travelPlanService.GetAsync(travelPlanId, includeStatus: true);
 
                 travelPlanDTO.Travelers = userTravelers.ToList();
 
@@ -152,7 +156,7 @@ namespace TravelogApi.Controllers
 
                 var loggedInUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
 
-                var lstTravelPlanDTO = await _travelPlanRepository.ListAsync(new Guid(loggedInUserId), status);
+                var lstTravelPlanDTO = await _travelPlanService.ListAsync(new Guid(loggedInUserId), status);
 
                 return Ok(lstTravelPlanDTO);
             }
@@ -169,7 +173,7 @@ namespace TravelogApi.Controllers
             {
                 var loggedInUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
 
-                var isSuccessful = await _travelPlanRepository.RemoveTraveler(new Guid(loggedInUserId), travelerUsername, travelPlanId);
+                var isSuccessful = await _travelPlanService.RemoveTraveler(new Guid(loggedInUserId), travelerUsername, travelPlanId);
 
                 if (!isSuccessful)
                 {

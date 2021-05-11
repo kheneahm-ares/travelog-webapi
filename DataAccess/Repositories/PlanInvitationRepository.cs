@@ -31,22 +31,11 @@ namespace DataAccess.Repositories
             _travelPlanRepository = travelPlanRepository;
             ConnectionString = configuration.GetConnectionString("TravelogApi");
         }
-
-        public async Task AcceptInvitation(Guid invitee, int invitationId)
+        public async Task DeleteInvitation(PlanInvitation invitation)
         {
-            //get invitation
-            var invitation = await _dbContext.PlanInvitations.FindAsync(invitationId);
-
-            if (invitation?.InviteeId != invitee)
+            try
             {
-                throw new Exception("Cannot accept invitation");
-            }
-
-            var isSuccessful = await _travelPlanRepository.AddTravelerAsync(invitation.TravelPlanId, invitee);
-
-            if (isSuccessful)
-            {
-                //after we added the user, remove the invitation
+                //accepting means remove the invitation from table
                 _dbContext.PlanInvitations.Remove(invitation);
                 var result = await _dbContext.SaveChangesAsync();
 
@@ -56,29 +45,10 @@ namespace DataAccess.Repositories
                     throw new Exception("Could not save invitation changes");
                 }
             }
-        }
-
-        public async Task DeclineInvitation(Guid invitee, int invitationId)
-        {
-            var invitation = await _dbContext.PlanInvitations.FindAsync(invitationId);
-
-            if (invitation == null)
+            catch (Exception)
             {
-                return;
-            }
-            if (invitation?.InviteeId != invitee)
-            {
-                throw new Exception("Cannot delete invitation");
-            }
 
-            //remove invitation from table
-            _dbContext.PlanInvitations.Remove(invitation);
-            var result = await _dbContext.SaveChangesAsync();
-
-            if (result <= 0)
-            {
-                //log here
-                throw new Exception("Could not save invitation changes");
+                throw;
             }
         }
 
@@ -90,8 +60,6 @@ namespace DataAccess.Repositories
                 var travelPlan = await _dbContext.TravelPlans.Where(tp => tp.TravelPlanId == travelPlanId)
                                                              .Include((tp) => tp.UserTravelPlans)
                                                              .FirstOrDefaultAsync();
-
-                
 
                 //validate the inviter is the host
                 if (travelPlan.CreatedById != inviter)
@@ -109,7 +77,7 @@ namespace DataAccess.Repositories
                 }
 
                 //check if user to invite is already part of plan
-                if(travelPlan.UserTravelPlans.Exists((utp) => utp.UserId == new Guid(userToInvite.Id)))
+                if (travelPlan.UserTravelPlans.Exists((utp) => utp.UserId == new Guid(userToInvite.Id)))
                 {
                     throw new CommonException("User is already a traveler!");
                 }
@@ -132,7 +100,7 @@ namespace DataAccess.Repositories
             }
             catch (DbUpdateException exc)
             {
-                if(exc.InnerException is SqlException sqlExc)
+                if (exc.InnerException is SqlException sqlExc)
                 {
                     switch (sqlExc.Number)
                     {
@@ -140,7 +108,6 @@ namespace DataAccess.Repositories
                         default: throw;
                     }
                 }
-
             }
             catch (Exception exc)
             {
@@ -172,7 +139,7 @@ namespace DataAccess.Repositories
                     userInvitations = enumerablInvs.ToList();
                 }
 
-                if(userInvitations == null)
+                if (userInvitations == null)
                 {
                     return new List<PlanInvitationDto>();
                 }
@@ -190,6 +157,20 @@ namespace DataAccess.Repositories
                 return userInvitations;
             }
             catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<PlanInvitation> GetInvitation(int invitationId)
+        {
+            try
+            {
+                var invitation = await _dbContext.PlanInvitations.FindAsync(invitationId);
+
+                return invitation;
+            }
+            catch (Exception)
             {
                 throw;
             }

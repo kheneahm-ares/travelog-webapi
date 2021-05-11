@@ -1,3 +1,5 @@
+using Business.TravelPlan;
+using Business.TravelPlan.Interfaces;
 using DataAccess.Repositories;
 using DataAccess.Repositories.Interfaces;
 using Microsoft.AspNetCore.Builder;
@@ -52,6 +54,7 @@ namespace TravelogApi
                         config.Audience = "TravelogApi";
                     });
 
+            //repos
             services.AddScoped<ITravelPlanRepository, TravelPlanRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserTravelPlanRepository, UserTravelPlanRepository>();
@@ -59,6 +62,12 @@ namespace TravelogApi
             services.AddScoped<IPlanInvitationRepository, PlanInvitationRepository>();
             services.AddScoped<ITravelPlanStatusRepository, TravelPlanStatusRepository>();
             services.AddScoped<ITPAnnouncementRepository, TPAnnouncementRepository>();
+
+            //bus services
+            services.AddScoped<ITravelPlanService, TravelPlanService>();
+            services.AddScoped<ITravelPlanInvitationService, TravelPlanInvitationService>();
+            services.AddScoped<ITravelPlanStatusService, TravelPlanStatusService>();
+            services.AddScoped<IUserTravelPlanService, UserTravelPlanService>();
 
             services.AddControllers();
         }

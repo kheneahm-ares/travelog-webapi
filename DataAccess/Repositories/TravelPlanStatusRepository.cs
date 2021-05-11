@@ -1,6 +1,7 @@
 ﻿using DataAccess.Common.Enums;
 using DataAccess.Repositories.Interfaces;
 using Domain.DTOs;
+using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using System.Collections.Generic;
@@ -18,25 +19,17 @@ namespace DataAccess.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<List<TravelPlanStatusDto>> ListAsync()
+        public async Task<List<TravelPlanStatus>> ListAsync()
         {
             var tpStatuses = await _dbContext.TravelPlanStatuses.ToListAsync();
-
-            var tpStatusDtos = tpStatuses.Select(tps => new TravelPlanStatusDto() { UniqStatus = tps.UniqStatus, Description = tps.Description }).ToList();
-            return tpStatusDtos;
+            return tpStatuses;
         }
 
-        public async Task<TravelPlanStatusDto> GetStatusAsync(TravelPlanStatusEnum status)
+        public async Task<TravelPlanStatus> GetStatusAsync(TravelPlanStatusEnum status)
         {
             var tpStatus = await _dbContext.TravelPlanStatuses.Where((tps) => tps.UniqStatus == status).FirstOrDefaultAsync();
+            return tpStatus;
 
-            var tpStatusDto = new TravelPlanStatusDto()
-            {
-                Description = tpStatus.Description,
-                UniqStatus = tpStatus.UniqStatus
-            };
-
-            return tpStatusDto;
         }
     }
 }

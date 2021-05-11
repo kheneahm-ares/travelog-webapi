@@ -18,7 +18,10 @@ namespace DataAccess.Repositories
         private readonly IUserRepository _userRepository;
         private readonly ITravelPlanStatusRepository _travelPlanStatusRepository;
 
-        public TravelPlanRepository(AppDbContext dbContext, IUserRepository userRepository, ITravelPlanStatusRepository travelPlanStatusRepository)
+        public TravelPlanRepository(AppDbContext dbContext, 
+                                    IUserRepository userRepository,
+                                    ITravelPlanStatusRepository travelPlanStatusRepository)
+
         {
             _dbContext = dbContext;
             _userRepository = userRepository;
@@ -32,10 +35,6 @@ namespace DataAccess.Repositories
                 //check if travelplan exists
                 var travelPlan = await _dbContext.TravelPlans.FindAsync(travelPlanId);
                 if (travelPlan == null) throw new Exception("Travel Plan Not Found");
-
-                //check if user exists
-                var userExists = await _userRepository.DoesUserExistAsync(userToAddId);
-                if (!userExists) throw new Exception("Invalid User Id");
 
                 var newUserTravelPlan = new UserTravelPlan
                 {
@@ -55,37 +54,17 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<TravelPlanDto> CreateAsync(TravelPlanDto travelPlanDto, Guid userId)
+        public async Task<TravelPlan> CreateAsync(TravelPlan newTravelPlan)
         {
             try
             {
-                //map here
-                var newTravelPlan = new TravelPlan
-                {
-                    Name = travelPlanDto.Name,
-                    Description = travelPlanDto.Description,
-                    StartDate = travelPlanDto.StartDate,
-                    EndDate = travelPlanDto.EndDate,
-                    CreatedById = userId,
-                    TravelPlanStatusId = (int)TravelPlanStatusEnum.Created
-                };
-
                 await _dbContext.TravelPlans.AddAsync(newTravelPlan);
-
-                //add to jxn table
-                var traveler = new UserTravelPlan
-                {
-                    TravelPlan = newTravelPlan,
-                    UserId = userId
-                };
-
-                await _dbContext.UserTravelPlans.AddAsync(traveler);
 
                 var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
 
                 if (isSuccessful)
                 {
-                    return new TravelPlanDto(newTravelPlan);
+                    return newTravelPlan;
                 }
                 throw new Exception("Problem Editing Travel Plan");
             }
@@ -95,16 +74,10 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<bool> DeleteAsync(Guid travelPlanId, Guid userId)
+        public async Task<bool> DeleteAsync(TravelPlan travelPlanToDelete)
         {
             try
             {
-                var travelPlanToDelete = await _dbContext.TravelPlans.FindAsync(travelPlanId);
-
-                if (travelPlanToDelete == null) return true;
-
-                if (travelPlanToDelete.CreatedById != userId) throw new InsufficientRightsException("Insufficient rights to delete Travel Plan");
-
                 //let EF core cascade delete and delete relations with dependent tables via collection nav properties
                 _dbContext.Remove(travelPlanToDelete);
 
@@ -118,83 +91,73 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<TravelPlanDto> EditAsync(TravelPlanDto travelPlanDto, Guid userId)
+        //public async Task<TravelPlanDto> EditAsync(TravelPlanDto travelPlanDto, Guid userId)
+        //{
+        //    try
+        //    {
+        //        var travelPlanToEdit = await _dbContext.TravelPlans.FindAsync(travelPlanDto.Id);
+        //        if (travelPlanToEdit == null) throw new Exception("Travel Plan Not Found");
+
+        //        if (travelPlanToEdit.CreatedById != userId) throw new InsufficientRightsException("Insufficient rights to edit Travel Plan");
+
+        //        //map here
+        //        travelPlanToEdit.TravelPlanId = travelPlanDto.Id;
+        //        travelPlanToEdit.Name = travelPlanDto.Name;
+        //        travelPlanToEdit.StartDate = travelPlanDto.StartDate;
+        //        travelPlanToEdit.EndDate = travelPlanDto.EndDate;
+        //        travelPlanToEdit.Description = travelPlanDto.Description;
+
+        //        if (!_dbContext.ChangeTracker.HasChanges()) return travelPlanDto;
+
+        //        var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
+
+        //        if (isSuccessful)
+        //        {
+        //            return new TravelPlanDto(travelPlanToEdit);
+        //        }
+        //        throw new Exception("Problem Editing Travel Plan");
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
+
+        //public async Task<bool> UpdateTPStatus(TravelPlan travelPlanToEdit, int status)
+        //{
+        //    if (!_dbContext.ChangeTracker.HasChanges())
+        //    {
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
+        //        return isSuccessful;
+        //    }
+        //}
+
+
+        public async Task<TravelPlan> GetAsync(Guid travelPlanId, bool includeUTP = false)
         {
             try
             {
-                var travelPlanToEdit = await _dbContext.TravelPlans.FindAsync(travelPlanDto.Id);
-                if (travelPlanToEdit == null) throw new Exception("Travel Plan Not Found");
 
-                if (travelPlanToEdit.CreatedById != userId) throw new InsufficientRightsException("Insufficient rights to edit Travel Plan");
-
-                //map here
-                travelPlanToEdit.TravelPlanId = travelPlanDto.Id;
-                travelPlanToEdit.Name = travelPlanDto.Name;
-                travelPlanToEdit.StartDate = travelPlanDto.StartDate;
-                travelPlanToEdit.EndDate = travelPlanDto.EndDate;
-                travelPlanToEdit.Description = travelPlanDto.Description;
-
-                if (!_dbContext.ChangeTracker.HasChanges()) return travelPlanDto;
-
-                var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
-
-                if (isSuccessful)
+                TravelPlan travelPlan;
+                if(includeUTP)
                 {
-                    return new TravelPlanDto(travelPlanToEdit);
+                    travelPlan = await _dbContext.TravelPlans.Where((tp) => tp.TravelPlanId == travelPlanId)
+                                                               .Include(tp => tp.UserTravelPlans)
+                                                               .FirstOrDefaultAsync();
                 }
-                throw new Exception("Problem Editing Travel Plan");
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-        public async Task<Dictionary<string, TravelPlanStatusDto>> SetStatusAsync(Guid travelPlanid, Guid userId, int status)
-        {
-            try
-            {
-                if(!Enum.IsDefined(typeof(TravelPlanStatusEnum), status))
+                else
                 {
-                    throw new Exception("Problem Setting Status of Travel Plan");
+                    travelPlan = await _dbContext.TravelPlans.FindAsync(travelPlanId);
                 }
 
-                var travelPlanToEdit = await _dbContext.TravelPlans.FindAsync(travelPlanid);
-                if (travelPlanToEdit == null) throw new Exception("Travel Plan Not Found");
-
-                if (travelPlanToEdit.CreatedById != userId) throw new InsufficientRightsException("Insufficient rights to edit Travel Plan");
-
-                travelPlanToEdit.TravelPlanStatusId = status;
-
-
-                var tpStatusDto = await _travelPlanStatusRepository.GetStatusAsync((TravelPlanStatusEnum)status);
-
-                if (!_dbContext.ChangeTracker.HasChanges()) return new Dictionary<string, TravelPlanStatusDto> { { travelPlanid.ToString(), tpStatusDto } };
-
-                var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
-                if(isSuccessful)
-                {
-                    return new Dictionary<string, TravelPlanStatusDto> { { travelPlanid.ToString(), tpStatusDto } };
-                }
-                throw new Exception("Problem occurred saving status of Travel Plan"); 
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-
-
-        public async Task<TravelPlanDto> GetAsync(Guid travelPlanId)
-        {
-            try
-            {
-                var travelPlan = await _dbContext.TravelPlans.FindAsync(travelPlanId);
-
-                if (travelPlan == null) throw new Exception("Travel Plan not found");
 
                 var travelPlanDto = new TravelPlanDto(travelPlan);
-                var tpStatus = await _dbContext.TravelPlanStatuses.Where(tps => tps.UniqStatus == (TravelPlanStatusEnum)travelPlan.TravelPlanStatusId).FirstOrDefaultAsync();
+                var tpStatus = await _dbContext.TravelPlanStatuses.Where(tps => tps.UniqStatus == (TravelPlanStatusEnum)travelPlan.TravelPlanStatusId)
+                                                                  .FirstOrDefaultAsync();
 
                 travelPlanDto.TravelPlanStatus = new TravelPlanStatusDto
                 {
@@ -202,7 +165,7 @@ namespace DataAccess.Repositories
                     Description = tpStatus.Description
                 };
 
-                return travelPlanDto;
+                return travelPlan;
             }
             catch
             {
@@ -210,101 +173,24 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<List<TravelPlanDto>> ListAsync(Guid userId, int? status = null)
+        public async Task<List<TravelPlan>> GetTravelPlansWithFilterAsync(IEnumerable<Guid> travelPlanIDs, int? status = null)
         {
-            try
+            var travelPlans = new List<TravelPlan>();
+
+            //if null, aka not specified, get all,
+            //else get specific 
+            if (status == null)
             {
-
-                //get travel plans associated with the user, whether they created it or just belong it
-                var userTravelPlanIds = await _dbContext.UserTravelPlans.Where(utp => utp.UserId == userId).Select((utp) => utp.TravelPlanId).ToListAsync();
-
-                var travelPlans = new List<TravelPlan>();
-
-                //if null, aka not specified get all,
-                //else get specific 
-                if (status == null)
-                {
-                    travelPlans = await _dbContext.TravelPlans.Where((tp) => userTravelPlanIds.Contains(tp.TravelPlanId))
-                                                              .OrderBy((tp) => tp.StartDate).ToListAsync();
-                }
-                else if (Enum.IsDefined(typeof(TravelPlanStatusEnum), status))
-                {
-                    travelPlans = await _dbContext.TravelPlans.Where((tp) => userTravelPlanIds.Contains(tp.TravelPlanId) && tp.TravelPlanStatusId == status)
-                                                              .OrderBy((tp) => tp.StartDate).ToListAsync();
-                }
-
-                List<TravelPlanDto> lstTravelPlanDto = new List<TravelPlanDto>();
-
-                foreach(var tp in travelPlans)
-                {
-                    var tpDto = new TravelPlanDto(tp);
-                    var tpStatus = await _dbContext.TravelPlanStatuses.Where(tps => tps.UniqStatus == (TravelPlanStatusEnum)tp.TravelPlanStatusId).FirstOrDefaultAsync();
-
-                    tpDto.TravelPlanStatus = new TravelPlanStatusDto
-                    {
-                        UniqStatus = tpStatus.UniqStatus,
-                        Description = tpStatus.Description
-                    };
-
-                    lstTravelPlanDto.Add(tpDto); 
-                }
-
-                return lstTravelPlanDto;
+                travelPlans = await _dbContext.TravelPlans.Where((tp) => travelPlanIDs.Contains(tp.TravelPlanId))
+                                                          .OrderBy((tp) => tp.StartDate).ToListAsync();
             }
-            catch (Exception)
+            else if (Enum.IsDefined(typeof(TravelPlanStatusEnum), status))
             {
-                throw;
+                travelPlans = await _dbContext.TravelPlans.Where((tp) => travelPlanIDs.Contains(tp.TravelPlanId) && tp.TravelPlanStatusId == status)
+                                                          .OrderBy((tp) => tp.StartDate).ToListAsync();
             }
-        }
 
-        public async Task<bool> RemoveTraveler(Guid loggedInUserId, string travelerUsername, Guid travelPlanId)
-        {
-            try
-            {
-                //validate travelplan
-                var travelPlan = await _dbContext.TravelPlans.Where((tp) => tp.TravelPlanId == travelPlanId).Include((tp) => tp.UserTravelPlans).FirstOrDefaultAsync();
-
-                if (travelPlan == null)
-                {
-                    throw new Exception("Travel Plan Not Found");
-                }
-
-                //validate traveler to remove
-                var travelerToRemove = await _userRepository.GetUserAsync(travelerUsername);
-                if (travelerToRemove == null)
-                {
-                    return true;
-                }
-
-                var userTP = travelPlan.UserTravelPlans.Where((utp) => utp.UserId.ToString() == travelerToRemove.Id).FirstOrDefault();
-
-                //if user actually was never part of the utp then just return
-                if (userTP == null)
-                {
-                    return true;
-                }
-
-                //only hosts have removal rights
-                var isUserHost = loggedInUserId == travelPlan.CreatedById;
-                var userNotHostButIsTraveler = !isUserHost && loggedInUserId.ToString() == travelerToRemove.Id;
-
-                if (isUserHost || userNotHostButIsTraveler)
-                {
-                    //remove entry tying user to TP
-                    _dbContext.UserTravelPlans.Remove(userTP);
-                    var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
-
-                    return isSuccessful;
-                }
-                else
-                {
-                    throw new InsufficientRightsException("Insufficient rights to Travel Plan");
-                }
-            }
-            catch (Exception exc)
-            {
-                throw;
-            }
+            return travelPlans;
         }
     }
 }
