@@ -52,44 +52,10 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task InviteUser(Guid inviter, string inviteeUsername, Guid travelPlanId)
+        public async Task InviteUser(PlanInvitation newInvitation)
         {
             try
             {
-                //get travel plan
-                var travelPlan = await _dbContext.TravelPlans.Where(tp => tp.TravelPlanId == travelPlanId)
-                                                             .Include((tp) => tp.UserTravelPlans)
-                                                             .FirstOrDefaultAsync();
-
-                //validate the inviter is the host
-                if (travelPlan.CreatedById != inviter)
-                {
-                    //log here
-                    throw new InsufficientRightsException("User doesn't have rights to add to travelplan");
-                }
-
-                //validate invitee exists
-                var userToInvite = await _userRepository.GetUserAsync(inviteeUsername);
-                if (userToInvite == null)
-                {
-                    //log here
-                    throw new UserNotFoundException("User to add does not exist");
-                }
-
-                //check if user to invite is already part of plan
-                if (travelPlan.UserTravelPlans.Exists((utp) => utp.UserId == new Guid(userToInvite.Id)))
-                {
-                    throw new CommonException("User is already a traveler!");
-                }
-
-                var newInvitation = new PlanInvitation
-                {
-                    Created = DateTime.UtcNow,
-                    Expiration = DateTime.UtcNow.AddDays(7),
-                    InvitedById = inviter,
-                    InviteeId = new Guid(userToInvite.Id),
-                    TravelPlanId = travelPlanId
-                };
                 _dbContext.PlanInvitations.Add(newInvitation);
                 var result = await _dbContext.SaveChangesAsync();
 
@@ -104,6 +70,7 @@ namespace DataAccess.Repositories
                 {
                     switch (sqlExc.Number)
                     {
+                        //2627 is unique id already exists
                         case 2627: throw new UniqueConstraintException("Invitation has already been sent");
                         default: throw;
                     }
@@ -115,18 +82,10 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<IEnumerable<PlanInvitationDto>> List(Guid loggedInUserId)
+        public async Task<List<PlanInvitationDto>> List(Guid loggedInUserId)
         {
             try
             {
-                //validate user
-                var currUser = await _userRepository.GetUserAsync(loggedInUserId);
-                if (currUser == null)
-                {
-                    //log here
-                    throw new UserNotFoundException("User to add does not exist");
-                }
-
                 //get invitations
                 const string PLAN_INVITATIONS_FOR_USER_SQL = @"SELECT INV.ID, TP.NAME as TravelPlanName, INV.INVITEEID as InviteeId, INV.INVITEDBYID as InvitedById, TP.TRAVELPLANID as TravelPlanId, INV.CREATED as CreatedDate, INV.EXPIRATION as ExpirationDate FROM PLANINVITATIONS INV INNER JOIN TRAVELPLANS TP ON TP.TRAVELPLANID = INV.TRAVELPLANID WHERE INV.INVITEEID=@loggedInUserId";
 
@@ -137,22 +96,6 @@ namespace DataAccess.Repositories
                                                 .QueryAsync<PlanInvitationDto>(PLAN_INVITATIONS_FOR_USER_SQL,
                                                                                             new { loggedInUserId = loggedInUserId });
                     userInvitations = enumerablInvs.ToList();
-                }
-
-                if (userInvitations == null)
-                {
-                    return new List<PlanInvitationDto>();
-                }
-
-                //get the inviters username
-                foreach (var inv in userInvitations)
-                {
-                    var inviterUser = await _userRepository.GetUserAsync(inv.InvitedById);
-                    if (inviterUser == null)
-                    {
-                        userInvitations.Remove(inv);
-                    }
-                    inv.InviterUsername = inviterUser.UserName;
                 }
                 return userInvitations;
             }

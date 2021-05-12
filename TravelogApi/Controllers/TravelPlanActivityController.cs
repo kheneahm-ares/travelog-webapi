@@ -13,12 +13,12 @@ namespace TravelogApi.Controllers
     public class TravelPlanActivityController : Controller
     {
         private readonly ITPActivityService _activityService;
-        private readonly IUserTravelPlanRepository _userTravelPlanRepository;
+        private readonly IUserTravelPlanService _userTravelPlanService;
 
-        public TravelPlanActivityController(ITPActivityService activityService, IUserTravelPlanRepository userTravelPlanRepository)
+        public TravelPlanActivityController(ITPActivityService activityService, IUserTravelPlanService userTravelPlanService)
         {
             _activityService = activityService;
-            _userTravelPlanRepository = userTravelPlanRepository;
+            _userTravelPlanService = userTravelPlanService;
         }
 
         [HttpPost]
@@ -100,7 +100,7 @@ namespace TravelogApi.Controllers
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
                 var travelPlanId = new Guid(id);
-                var travelers = await _userTravelPlanRepository.GetTravelersForActivityAsync(travelPlanId);
+                var travelers = await _userTravelPlanService.GetTravelersForActivityAsync(travelPlanId);
                 if(travelers.Count() == 0)
                 {
                     //travel plan doesn't exist

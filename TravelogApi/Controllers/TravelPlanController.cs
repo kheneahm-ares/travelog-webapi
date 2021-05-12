@@ -14,20 +14,19 @@ namespace TravelogApi.Controllers
     //[Authorize]
     public class TravelPlanController : Controller
     {
-        private readonly IUserTravelPlanRepository _userTravelPlanRepository;
-        private readonly IPlanInvitationRepository _planInvitationRepository;
         private readonly ITravelPlanService _travelPlanService;
         private readonly IUserRepository _userRepository;
+        private readonly IUserTravelPlanService _userTravelPlanService;
+        private readonly ITravelPlanInvitationService _travelPlanInvitationService;
 
-        public TravelPlanController(ITravelPlanRepository travelPlanRepository,
-                                    IUserRepository userRepository,
-                                    IUserTravelPlanRepository userTravelPlanRepository,
-                                    IPlanInvitationRepository planInvitationRepository,
+        public TravelPlanController(IUserRepository userRepository,
+                                    IUserTravelPlanService userTravelPlanService,
+                                    ITravelPlanInvitationService travelPlanInvitationService,
                                     ITravelPlanService travelPlanService)
         {
             _userRepository = userRepository;
-            _userTravelPlanRepository = userTravelPlanRepository;
-            _planInvitationRepository = planInvitationRepository;
+            _userTravelPlanService = userTravelPlanService;
+            _travelPlanInvitationService = travelPlanInvitationService;
             _travelPlanService = travelPlanService;
         }
 
@@ -127,7 +126,7 @@ namespace TravelogApi.Controllers
                 var travelPlanId = new Guid(id);
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
 
-                var travelers = await _userTravelPlanRepository.GetTravelersForActivityAsync(travelPlanId);
+                var travelers = await _userTravelPlanService.GetTravelersForActivityAsync(travelPlanId);
                 if (!travelers.Contains(new Guid(userId)))
                 {
                     return Forbid();
@@ -206,7 +205,7 @@ namespace TravelogApi.Controllers
             {
                 var loggedInUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
 
-                await _planInvitationRepository.InviteUser(new Guid(loggedInUserId), inviteeUsername, travelPlanId);
+                await _travelPlanInvitationService.InviteUser(new Guid(loggedInUserId), inviteeUsername, travelPlanId);
 
                 return Ok();
             }

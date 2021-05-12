@@ -10,9 +10,9 @@ namespace DataAccess.Repositories.Interfaces
 {
     public interface IPlanInvitationRepository
     {
-        Task InviteUser(Guid inviter, string inviteeUsername, Guid TravelPlanId);
+        Task InviteUser(PlanInvitation newInvitation);
         Task<PlanInvitation> GetInvitation(int invitationId);
-        Task<IEnumerable<PlanInvitationDto>> List(Guid loggedInUserId);
+        Task<List<PlanInvitationDto>> List(Guid loggedInUserId);
         Task DeleteInvitation(PlanInvitation invitation);
     }
 }
