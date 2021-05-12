@@ -11,7 +11,6 @@ namespace DataAccess.Repositories.Interfaces
     public interface ITravelPlanActivityRepository
     {
         Task<TravelPlanActivity> CreateAsync(TravelPlanActivity newActivity);
-        Task<TravelPlanActivityDto> EditAsync(TravelPlanActivityDto activityDto, Guid userId);
         Task<bool> DeleteAsync(TravelPlanActivity activityToDelete);
         Task<TravelPlanActivity> GetAsync(Guid activityId);
         Task<List<TravelPlanActivity>> ListAsync(Guid travelPlanId);

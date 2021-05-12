@@ -1,4 +1,5 @@
-﻿using DataAccess.CustomExceptions;
+﻿using Business.TravelPlan.Interfaces;
+using DataAccess.CustomExceptions;
 using DataAccess.Repositories.Interfaces;
 using Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +13,11 @@ namespace TravelogApi.Controllers
     [Route("/TravelPlan/[controller]/[action]")]
     public class AnnouncementController : Controller
     {
-        private readonly ITPAnnouncementRepository _announcementRepo;
+        private readonly ITPAnnouncementService _announcementService;
 
-        public AnnouncementController(ITPAnnouncementRepository announcementRepo)
+        public AnnouncementController(ITPAnnouncementService announcementService)
         {
-            _announcementRepo = announcementRepo;
+            _announcementService = announcementService;
         }
 
         [HttpGet]
@@ -24,7 +25,7 @@ namespace TravelogApi.Controllers
         {
             try
             {
-                var announcements = await _announcementRepo.ListAsync(travelPlanId, limit, offset);
+                var announcements = await _announcementService.ListAsync(travelPlanId, limit, offset);
                 return Ok(announcements);
             }
             catch (Exception)
@@ -41,7 +42,7 @@ namespace TravelogApi.Controllers
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
 
-                var isSuccessful = await _announcementRepo.DeleteAsync(announcementId, new Guid(userId));
+                var isSuccessful = await _announcementService.DeleteAsync(announcementId, new Guid(userId));
 
                 if (isSuccessful)
                 {
@@ -70,7 +71,7 @@ namespace TravelogApi.Controllers
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
 
-                var announcement = await _announcementRepo.CreateAsync(announcementDto, new Guid(userId));
+                var announcement = await _announcementService.CreateAsync(announcementDto, new Guid(userId));
                 return Ok(announcement);
             }
             catch (InsufficientRightsException insufExc)
@@ -93,7 +94,7 @@ namespace TravelogApi.Controllers
             {
                 var userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
 
-                var announcement = await _announcementRepo.EditAsync(announcementDto, new Guid(userId));
+                var announcement = await _announcementService.EditAsync(announcementDto, new Guid(userId));
                 return Ok(announcement);
             }
             catch (InsufficientRightsException insufExc)

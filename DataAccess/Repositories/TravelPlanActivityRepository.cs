@@ -55,44 +55,6 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<TravelPlanActivityDto> EditAsync(TravelPlanActivityDto activityDto, Guid userId)
-        {
-            try
-            {
-                var activityToEdit = await _dbContext.TravelPlanActivities
-                                                     .Include(tpa => tpa.Location)
-                                                     .FirstOrDefaultAsync(tpa => tpa.TravelPlanActivityId == activityDto.Id);
-
-                if (activityToEdit == null) throw new Exception("Activity not found");
-                if (activityToEdit.HostId != userId) throw new InsufficientRightsException("Insufficient rights to edit activity");
-
-                //map lib here
-                activityToEdit.Name = activityDto.Name;
-                activityToEdit.StartTime = activityDto.StartTime;
-                activityToEdit.EndTime = activityDto.EndTime;
-                activityToEdit.Location.Address = activityDto.Location.Address;
-                activityToEdit.Location.Longitude = activityDto.Location.Longitude;
-                activityToEdit.Location.Latitude = activityDto.Location.Latitude;
-                activityToEdit.Category = activityDto.Category;
-
-                if (!_dbContext.ChangeTracker.HasChanges())
-                {
-                    return activityDto;
-                }
-
-                var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
-                if (isSuccessful)
-                {
-                    return new TravelPlanActivityDto(activityToEdit);
-                }
-                throw new Exception("Error saving changes");
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
         public async Task<TravelPlanActivity> GetAsync(Guid activityId)
         {
             try
