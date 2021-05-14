@@ -16,20 +16,20 @@ namespace Business.TravelPlan
     {
         private readonly ITravelPlanRepository _travelPlanRepository;
         private readonly IUserRepository _userRepository;
-        private readonly ITravelPlanStatusRepository _travelPlanStatusRepository;
         private readonly IUserTravelPlanService _userTravelPlanService;
+        private readonly ITravelPlanStatusService _travelPlanStatusService;
         private readonly AppDbContext _dbContext;
 
         public TravelPlanService(ITravelPlanRepository travelPlanRepository,
                                  IUserRepository userRepository,
-                                 ITravelPlanStatusRepository travelPlanStatusRepository,
                                  IUserTravelPlanService userTravelPlanService,
+                                 ITravelPlanStatusService travelPlanStatusService,
                                  AppDbContext dbContext)
         {
             _travelPlanRepository = travelPlanRepository;
             _userRepository = userRepository;
-            _travelPlanStatusRepository = travelPlanStatusRepository;
             _userTravelPlanService = userTravelPlanService;
+            _travelPlanStatusService = travelPlanStatusService;
             _dbContext = dbContext;
         }
 
@@ -145,7 +145,7 @@ namespace Business.TravelPlan
 
             if (includeStatus)
             {
-                var tpStatus = await _travelPlanStatusRepository.GetStatusAsync((TravelPlanStatusEnum)travelPlan.TravelPlanStatusId);
+                var tpStatus = await _travelPlanStatusService.GetStatusAsync((TravelPlanStatusEnum)travelPlan.TravelPlanStatusId);
 
                 travelPlanDto.TravelPlanStatus = new TravelPlanStatusDto
                 {
@@ -170,7 +170,7 @@ namespace Business.TravelPlan
                 foreach (var tp in travelPlans)
                 {
                     var tpDto = new TravelPlanDto(tp);
-                    var tpStatus = await _travelPlanStatusRepository.GetStatusAsync((TravelPlanStatusEnum)tp.TravelPlanStatusId);
+                    var tpStatus = await _travelPlanStatusService.GetStatusAsync((TravelPlanStatusEnum)tp.TravelPlanStatusId);
 
                     tpDto.TravelPlanStatus = new TravelPlanStatusDto
                     {
@@ -252,7 +252,7 @@ namespace Business.TravelPlan
                 var isSuccessful = await _dbContext.SaveChangesAsync() > 0;
                 if (isSuccessful)
                 {
-                    var tpStatus = await _travelPlanStatusRepository.GetStatusAsync((TravelPlanStatusEnum)status);
+                    var tpStatus = await _travelPlanStatusService.GetStatusAsync((TravelPlanStatusEnum)status);
                     return new Dictionary<string, TravelPlanStatusDto> { { travelPlanId.ToString(),
                         new TravelPlanStatusDto
                         {
