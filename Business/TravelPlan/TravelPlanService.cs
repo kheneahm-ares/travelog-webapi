@@ -207,7 +207,7 @@ namespace Business.TravelPlan
                     return true;
                 }
 
-                var userTPToRemove = travelPlan.UserTravelPlans.Where((utp) => utp.UserId.ToString() == travelerToRemove.Id).FirstOrDefault();
+                var userTPToRemove = travelPlan.UserTravelPlans?.Where((utp) => utp.UserId.ToString() == travelerToRemove.Id).FirstOrDefault();
 
                 //if user actually was never part of the utp then just return
                 if (userTPToRemove == null)
@@ -215,10 +215,18 @@ namespace Business.TravelPlan
                     return true;
                 }
 
-                //only hosts have removal rights
+                
                 var isUserHost = loggedInUserId == travelPlan.CreatedById;
+
+                if(isUserHost && loggedInUserId == userTPToRemove.UserId)
+                {
+                    throw new Exception("Host can't remove themselves from plan");
+                }
+
                 var userNotHostButIsTraveler = !isUserHost && loggedInUserId.ToString() == travelerToRemove.Id;
 
+
+                //hosts have delete rights or the travelers want to remove themselves
                 if (isUserHost || userNotHostButIsTraveler)
                 {
                     var isSuccessful = await _userTravelPlanService.Delete(userTPToRemove);
