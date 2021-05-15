@@ -214,7 +214,6 @@ namespace Business.TravelPlan
                 {
                     return true;
                 }
-
                 
                 var isUserHost = loggedInUserId == travelPlan.CreatedById;
 
@@ -223,8 +222,7 @@ namespace Business.TravelPlan
                     throw new Exception("Host can't remove themselves from plan");
                 }
 
-                var userNotHostButIsTraveler = !isUserHost && loggedInUserId.ToString() == travelerToRemove.Id;
-
+                var userNotHostButIsTraveler = !isUserHost && loggedInUserId == userTPToRemove.UserId;
 
                 //hosts have delete rights or the travelers want to remove themselves
                 if (isUserHost || userNotHostButIsTraveler)

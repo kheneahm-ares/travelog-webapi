@@ -1,31 +1,26 @@
-﻿using Business.TravelPlan.Interfaces;
+﻿using Business.TravelPlan;
+using Business.TravelPlan.Interfaces;
+using DataAccess.CustomExceptions;
+using DataAccess.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Models = Domain.Models;
-using DTOs = Domain.DTOs;
-using DataAccess.Repositories.Interfaces;
 using Persistence;
-using Business.TravelPlan;
-using Microsoft.EntityFrameworkCore;
-using DataAccess.CustomExceptions;
+using System;
+using System.Threading.Tasks;
+using DTOs = Domain.DTOs;
+using Models = Domain.Models;
 
 namespace TravelogApi.Tests.Business.TravelPlan
 {
     [TestClass]
     public class TPActivityServiceTests
     {
-
         private readonly MockRepository _mockRepo = new MockRepository(MockBehavior.Strict);
         private DTOs.TravelPlanActivityDto _genericActivityDTO;
         private Guid _emptyTPID;
         private Guid _emptyUserId;
         private DbContextOptions<AppDbContext> _dbOptions;
-
 
         //gets called before each test
         [TestInitialize]
@@ -51,11 +46,9 @@ namespace TravelogApi.Tests.Business.TravelPlan
             _dbOptions = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(databaseName: "TravelogApi").Options;
         }
 
-
         [TestMethod]
         public async Task CreateAsync_ValidActivity_ReturnsActivity()
         {
-
             var newActivity = new Models.TravelPlanActivity
             {
                 Name = _genericActivityDTO.Name,
@@ -82,7 +75,7 @@ namespace TravelogApi.Tests.Business.TravelPlan
             tpActivityRepo.Setup((tpa) => tpa.CreateAsync(It.IsAny<Models.TravelPlanActivity>())).ReturnsAsync(newActivity);
 
             //act
-            using(var context = new AppDbContext(_dbOptions))
+            using (var context = new AppDbContext(_dbOptions))
             {
                 var tpActivityService = new TPActivityService(context, tpService.Object, tpActivityRepo.Object);
                 var result = await tpActivityService.CreateAsync(_genericActivityDTO, _emptyUserId);
@@ -91,14 +84,12 @@ namespace TravelogApi.Tests.Business.TravelPlan
                 Assert.IsNotNull(result);
                 Assert.IsTrue(result is DTOs.TravelPlanActivityDto);
             }
-
         }
 
         [TestMethod]
         [ExpectedException(typeof(Exception))]
         public async Task CreateAsync_InvalidTPId_ThrowsException()
         {
-
             DTOs.TravelPlanDto travelPlanDto = null;
 
             var tpService = _mockRepo.Create<ITravelPlanService>();
@@ -115,7 +106,6 @@ namespace TravelogApi.Tests.Business.TravelPlan
 
                 //verify
             }
-
         }
 
         [TestMethod]
@@ -183,8 +173,5 @@ namespace TravelogApi.Tests.Business.TravelPlan
                 //verify
             }
         }
-
-
-
     }
 }
