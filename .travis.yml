@@ -6,7 +6,7 @@ services:
   - docker
 
 before_install:
-  - docker build -t kheneahmares/travelogapi-test .
+  - docker build -t kheneahmares/travelogapi-test -f Dockerfile.test .
 
 script:
-  - docker run -e CI=true kheneahmares/travelogapi-test dotnet test
+  - docker run -e CI=true kheneahmares/travelogapi-test

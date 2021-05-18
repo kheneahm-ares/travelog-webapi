@@ -20,11 +20,4 @@ COPY ./Persistence/. ./Persistence/
 COPY ./Business/. ./Business/
 COPY ./TravelogApi.Tests/. ./TravelogApi.Tests/
 
-RUN dotnet publish -c release -o out
-
-#start our app stage
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
-WORKDIR /app
-COPY --from=build /app/out .
-ENTRYPOINT [ "dotnet", "watch", "run", "--no-restore", "--urls", "https://host.docker.internal:5003" ]
-
+CMD ["dotnet", "test"]
