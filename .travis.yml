@@ -10,3 +10,10 @@ before_install:
 
 script:
   - docker run -e CI=true kheneahmares/travelogapi-test
+
+after_success:
+  - docker build -t kheneahmares/travelog-api .
+  #log into docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  #push the image to hub
+  - docker push kheneahmares/travelog-api
